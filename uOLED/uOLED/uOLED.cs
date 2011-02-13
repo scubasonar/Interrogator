@@ -75,6 +75,7 @@ namespace uOLED
         const  byte GSGC_RDPIXEL = 0x52; // Read Pixel
         const  byte GSGC_SCRNCOPYPASTE = 0x63; // Screen Copy-Paste
         const  byte GSGC_POLYGON = 0x67; // Draw Polygon
+        const  byte GSGC_REPLCOLOR = 0x6B; // replace colour
         const  byte GSGC_SETPEN = 0x70; // Set Pen Size
         const  byte GSGC_RECTANGLE = 0x72; // Draw Rectangle
         #endregion
@@ -271,29 +272,40 @@ namespace uOLED
 
         #region --------------- Graphics -------------------
 
-        public bool SetPenSize()
+        public bool SetPenSize(byte size)
         {
-            return false;
+            dPort.Write(new byte[] { GSGC_SETPEN, size }, 0, 2);
+
+            return Ack();
         }
 
-        public bool ReadPixel()
+        public byte[] ReadPixel(byte x, byte y)
         {
-            return false;
+            byte[] color = new byte[2];
+            dPort.Write(new byte[] { GSGC_RDPIXEL, x, y },0,3);
+            dPort.Read(color, 0, 2);
+
+            return color;
         }
 
-        public bool ScreenCopyPaste()
+        // xs/ys = top left corner of area to copy from, xd/yd = top left of desitnation, width and height are of area to copy
+        public bool ScreenCopyPaste(byte xs, byte ys, byte xd, byte yd, byte width, byte height)
         {
-            return false;
+            dPort.Write(new byte[] { GSGC_SCRNCOPYPASTE, xs, ys, xd, yd, width, height }, 0, 7);
+
+            return Ack();
         }
 
-        public bool ReplaceColor()
+        public bool ReplaceColor(byte x1, byte y1, byte x2, byte y2, byte[] colorOld, byte[] colorNew)
         {
-            return false;
+            dPort.Write(new byte[] {GSGC_REPLCOLOR, x1, y1, x2, y2, colorOld[0], colorOld[1], colorNew[0], colorNew[1]}, 0, 9);
+            return Ack();
         }
 
-        public bool SetBackground()
+        public bool SetBackground(byte[] color)
         {
-            return false;
+            dPort.Write(new byte[] { GSGC_BACKGND, color[0], color[1] }, 0, 3);
+            return Ack();
         }
 
         public bool ReplaceBackground(byte[] color)
@@ -302,9 +314,24 @@ namespace uOLED
             return Ack();
         }
 
-        public bool AddUserBitmapChar()
+        // saves a 1 byte wide by 8 bytes deep bit map char
+        // B7 | B6 | B5 | B4 | B3 | B2 | B1 | B0 | <- data bits
+        //    |    |    |    |    |    |    |    | data1
+        //    |    |    |    |    |    |    |    | data2
+        //    |    |    |    |    |    |    |    | data3
+        //    |    |    |    |    |    |    |    | data4
+        //    |    |    |    |    |    |    |    | data5
+        //    |    |    |    |    |    |    |    | data6
+        //    |    |    |    |    |    |    |    | data7
+        //    |    |    |    |    |    |    |    | data8
+        // char_idx = index between 0 to 31 / 0x00 to 0x1F
+        public bool AddUserBitmapChar(byte char_idx, byte[] data)
         {
-            return false;
+            if (data.Length > 8)
+                return false;
+            dPort.Write(new byte[] { GSGC_ADDBM, char_idx }, 0, 2);
+            dPort.Write(data, 0, data.Length);
+            return Ack();
         }
 
         public bool Cls()
@@ -366,9 +393,13 @@ namespace uOLED
             return Ack();
         }
 
-        public bool DrawIcon()
+        // 0,0 is at top left of image. use color mode = 0x08 for 256 colors(8bits per pixel), or 0x10 for 65K color mode(16 bits/pixel).
+        public bool DrawImage(byte x, byte y, byte width, byte height, byte colorMode, byte[] pixels)
         {
-            return false;
+            dPort.Write(new byte[] { GSGC_IMAGE, x, y, width, height, colorMode }, 0, 6);
+            dPort.Write(pixels, 0, pixels.Length);
+
+            return Ack();
         }
         #endregion
 
