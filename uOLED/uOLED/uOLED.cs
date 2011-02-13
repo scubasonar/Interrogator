@@ -393,15 +393,26 @@ namespace uOLED
             return Ack();
         }
 
-        public bool DrawCharGFX()
+        public bool DrawCharGFX(byte c, byte x, byte y, byte[] color, byte width, byte height)
         {
-
-            return false;
+            dPort.Write(new byte[] { GSGC_CHARGFX, x, y, color[0], color[1], width, height }, 0, 7);
+            return Ack();
         }
 
-        public bool DrawString()
+        // row shold be 0-15 for 5x7 and 8x8 fonts, 0-9 for 8x12 fonts
+        // column should be 0-20 for 5x7 font, 0-15 for 8x8 and 8x12 fonts
+        // font should be 0 for 5x7, 1 for 8x8, and 2 for 8x12
+        public bool DrawString(byte column, byte row, byte font, byte[] color, string s)
         {
-            return false;
+            byte[] buf = Encoding.UTF8.GetBytes(s);
+            dPort.Write(new byte[] { GSGC_STRINGTXT, column, row, font, color[0], color[1] }, 0, 6);
+            if (buf.Length > 256)
+                dPort.Write(buf, 0, 256);
+            else
+                dPort.Write(buf, 0, buf.Length);
+            dPort.Write(new byte[] { 0x00 }, 0, 1);
+            
+            return Ack();
         }
 
         public bool DrawStringGFX(byte x, byte y, byte font, byte[] color, byte width, byte height, string s)
