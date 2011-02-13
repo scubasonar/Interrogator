@@ -26,32 +26,18 @@ namespace uOLED
             display = new uOLED(disp);
             display.Cls();
             Thread.Sleep(50);
-
+            bool value = display.DrawPolygon(3, new byte[] { 32, 0, 0, 32, 50, 32}, new byte[] { 0xFF, 0xFF });
+           
+            
             while (true)
             {
-                if (display.AutoBaud())
-                {
-                    display.SetContrast(0);
-                    //display.UpdateDeviceInfo(true);
-                   // display.ChangeBackground(new byte[] { 0xFF, 0xFF });
-                    display.DrawCircle((byte) 10, (byte)20, (byte)(255), new byte[] { 0xFF, 0xFF });
-                    for (byte i = 0; i < 0x0F; i++)
-                    {
-                        display.SetContrast(i);
-                        Thread.Sleep(400);
-                    }
-
-                    for (byte i = 0x06; i > 0; i--)
-                    {
-                        display.SetContrast(i);
-                        Thread.Sleep(400);
-                    }
-
-                    display.ShutDown(true);
-                    Thread.Sleep(500);
-                    display.ShutDown(false);
-                    Thread.Sleep(300);
-                }
+                bool x;
+                x = display.DrawButtonTXT(0x01, 0, 0, new byte[] { 0x0F, 0xBF }, 0x00, new byte[] { 0xBB, 0x00 }, 1, 1, "hello");
+                //display.DrawChar((byte)'F', 0, 0, new byte[] { 0xFF, 0xFF });
+                //display.DrawStringGFX(0, 0, 0, new byte[] { 0xFF, 0xFF }, 5, 7, "hello");
+                Thread.Sleep(300);
+                x = display.DrawButtonTXT(0x00, 0, 0, new byte[] { 0x0F, 0xBF }, 0x00, new byte[] { 0xCF, 0xDF }, 1, 1, "hello");
+                Thread.Sleep(300);
             }
         }
     }

@@ -315,29 +315,49 @@ namespace uOLED
 
         #region ------Drawing ------------------------------
 
-        public bool DrawPixel()
+        public bool DrawPixel(byte x, byte y, byte[] color)
         {
-            return false;
+            dPort.Write(new byte[] { GSGC_PIXEL, x, y, color[0], color[1] }, 0, 5);
+            return Ack();
         }
 
-        public bool DrawLine()
+        public bool DrawLine(byte x1, byte y1, byte x2, byte y2, byte[] color)
         {
-            return false;
+            dPort.Write(new byte[] { GSGC_LINE, x1, y1, x2, y2, color[0], color[1] }, 0, 7);
+            return Ack();
         }
 
-        public bool DrawTriangle()
+        // draws a circle in an anti-clockwise fashion with x1y1 at the top of the triangle. 
+        //       1
+        //    2
+        //           3
+        // solid or wireframe drawing determined by 
+        // pen size 0 = solid
+        // pen size 1 = wireframe
+        public bool DrawTriangle(byte x1, byte y1, byte x2, byte y2, byte x3, byte y3, byte[] color)
         {
-            return false;
+            dPort.Write(new byte[] { GSGC_TRIANGLE, x1, y1, x2, y2, x3, y3, color[0], color[1] }, 0, 9);
+            return Ack();
         }
 
-        public bool DrawRectangle()
+        // pen size = 0 = solid
+        // pen size = 1 = wireframe
+        public bool DrawRectangle(byte x1, byte y1, byte x2, byte y2, byte[] color)
         {
-            return false;
+            dPort.Write(new byte[] { GSGC_RECTANGLE, x1, y1, x2, y2, color[0], color[1] }, 0, 8);
+            return Ack();
         }
 
-        public bool DrawPolygon()
+        public bool DrawPolygon(byte verticies, byte[] points, byte[] color)
         {
-            return false;
+            if ((verticies < 3) || (verticies > 7))
+                return false;
+
+            dPort.Write(new byte[] { GSGC_POLYGON, verticies }, 0, 2);
+            dPort.Write(points, 0, 2 * verticies);
+            dPort.Write(color, 0, 2);
+
+            return Ack();
         }
 
         public bool DrawCircle(byte x, byte y, byte r, byte[] color)
@@ -352,16 +372,63 @@ namespace uOLED
         }
         #endregion
 
-        
         #endregion
 
         #region ------------------ Text -----------------
-        public bool SetFont()
+        public bool SetFont(byte set) // set can be 0x00, 0x01, or 0x02(largest)
+        {
+            dPort.Write(new byte[] {GSGC_SETFONT, set}, 0, 2);
+            return Ack();
+        }
+
+        public bool SetOpacity(byte opaq)
+        {
+            dPort.Write(new byte[] { GSGC_SETOPAQUE, opaq }, 0, 2);
+            return Ack();
+        }
+
+        public bool DrawChar(byte c, byte column, byte row, byte[] color)
+        {
+            dPort.Write(new byte[] {GSGC_CHARTXT, c, column, row, color[0], color[1]}, 0, 6);
+            return Ack();
+        }
+
+        public bool DrawCharGFX()
+        {
+
+            return false;
+        }
+
+        public bool DrawString()
         {
             return false;
         }
 
+        public bool DrawStringGFX(byte x, byte y, byte font, byte[] color, byte width, byte height, string s)
+        {
+            byte[] buf = Encoding.UTF8.GetBytes(s);
+            dPort.Write(new byte[] { GSGC_STRINGGFX, x, y, font, color[0], color[1], width, height }, 0, 6);
+            if (buf.Length > 256)
+                dPort.Write(buf, 0, 256);
+            else
+                dPort.Write(buf, 0, buf.Length);
+            dPort.Write(new byte[] { 0x00 }, 0, 1);
 
+            return Ack();
+        }
+
+        public bool DrawButtonTXT(byte state, byte x, byte y, byte[] btnColor, byte font, byte[] strColor, byte width, byte height, string s)// tested 
+        {
+            byte[] buf = Encoding.UTF8.GetBytes(s);
+            dPort.Write(new byte[] { GSGC_BUTTONTXT, state, x, y, btnColor[0], btnColor[1], font, strColor[0], strColor[1], width, height }, 0, 11);
+            dPort.Write(buf, 0, buf.Length);
+            dPort.Write(new byte[] { 0x00 }, 0, 1);
+
+
+            return Ack();
+        }
+
+       
         #endregion
 
         #region -----------------SD/SDHC Memory Card-----------------
