@@ -1,0 +1,23 @@
+C:\Users\Matt\AppData\Local\Temporary Projects\FEZ Panda Application1\bin\Debug\le\FEZ Panda Application.exe
+C:\Users\Matt\AppData\Local\Temporary Projects\FEZ Panda Application1\bin\Debug\be\FEZ Panda Application.exe
+C:\Users\Matt\AppData\Local\Temporary Projects\FEZ Panda Application1\bin\Debug\le\FEZ Panda Application.pdb
+C:\Users\Matt\AppData\Local\Temporary Projects\FEZ Panda Application1\bin\Debug\be\FEZ Panda Application.pdb
+C:\Users\Matt\AppData\Local\Temporary Projects\FEZ Panda Application1\bin\Debug\FEZ Panda Application.exe
+C:\Users\Matt\AppData\Local\Temporary Projects\FEZ Panda Application1\bin\Debug\FEZ Panda Application.pdb
+C:\Users\Matt\AppData\Local\Temporary Projects\FEZ Panda Application1\bin\Debug\le\FEZ Panda Application.pe
+C:\Users\Matt\AppData\Local\Temporary Projects\FEZ Panda Application1\bin\Debug\le\FEZ Panda Application.pdbx
+C:\Users\Matt\AppData\Local\Temporary Projects\FEZ Panda Application1\bin\Debug\be\FEZ Panda Application.pe
+C:\Users\Matt\AppData\Local\Temporary Projects\FEZ Panda Application1\bin\Debug\be\FEZ Panda Application.pdbx
+C:\Users\Matt\AppData\Local\Temporary Projects\FEZ Panda Application1\obj\Debug\ResolveAssemblyReference.cache
+C:\Users\Matt\AppData\Local\Temporary Projects\FEZ Panda Application1\obj\Debug\TinyCLR_DebugReferences.cache
+C:\Users\Matt\AppData\Local\Temporary Projects\FEZ Panda Application1\obj\Debug\FEZ_Panda_Application1.Resources.resources
+C:\Users\Matt\AppData\Local\Temporary Projects\FEZ Panda Application1\obj\Debug\GenerateResource.read.1.tlog
+C:\Users\Matt\AppData\Local\Temporary Projects\FEZ Panda Application1\obj\Debug\GenerateResource.write.1.tlog
+C:\Users\Matt\AppData\Local\Temporary Projects\FEZ Panda Application1\obj\Debug\FEZ_Panda_Application1.Resources.tinyresources
+C:\Users\Matt\AppData\Local\Temporary Projects\FEZ Panda Application1\obj\Debug\TinyResGen.cache
+C:\Users\Matt\AppData\Local\Temporary Projects\FEZ Panda Application1\obj\Debug\FEZ Panda Application.exe
+C:\Users\Matt\AppData\Local\Temporary Projects\FEZ Panda Application1\obj\Debug\FEZ Panda Application.pdb
+C:\Users\Matt\AppData\Local\Temporary Projects\FEZ Panda Application1\obj\Debug\be\FEZ Panda Application.pe
+C:\Users\Matt\AppData\Local\Temporary Projects\FEZ Panda Application1\obj\Debug\be\FEZ Panda Application.pdbx
+C:\Users\Matt\AppData\Local\Temporary Projects\FEZ Panda Application1\obj\Debug\le\FEZ Panda Application.pe
+C:\Users\Matt\AppData\Local\Temporary Projects\FEZ Panda Application1\obj\Debug\le\FEZ Panda Application.pdbx
