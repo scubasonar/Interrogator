@@ -269,7 +269,6 @@ namespace uOLED
         }
         #endregion
 
-
         #region --------------- Graphics -------------------
 
         public bool SetPenSize(byte size)
