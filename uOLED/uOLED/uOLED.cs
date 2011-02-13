@@ -148,7 +148,6 @@ namespace uOLED
             return Ack();
         }
 
-
         /// <summary>
         /// Updates the device info data struct showing screen res etc
         /// </summary>
@@ -240,19 +239,6 @@ namespace uOLED
             return false;
         }
 
-        public bool ChangeBackground(byte[] color)
-        {
-            dPort.Write(new byte[] { GSGC_BACKGND, color[0], color[1] }, 0, 3);
-            return Ack();
-        }
-
-        // clear screen
-        public bool Cls()
-        {
-            dPort.Write(new byte[] { GSGC_CLS }, 0, 1);
-            return Ack();
-        }
-
         public bool On(bool on)
         {
             if (on)
@@ -280,23 +266,108 @@ namespace uOLED
                 dPort.Write(new byte[] { GSGC_DISPCONT, 0x03, 0x00 }, 0, 3);
             return (Ack());
         }
-
-
         #endregion
 
 
-        #region --------------- Drawing -------------------
+        #region --------------- Graphics -------------------
+
+        public bool SetPenSize()
+        {
+            return false;
+        }
+
+        public bool ReadPixel()
+        {
+            return false;
+        }
+
+        public bool ScreenCopyPaste()
+        {
+            return false;
+        }
+
+        public bool ReplaceColor()
+        {
+            return false;
+        }
+
+        public bool SetBackground()
+        {
+            return false;
+        }
+
+        public bool ReplaceBackground(byte[] color)
+        {
+            dPort.Write(new byte[] { GSGC_BACKGND, color[0], color[1] }, 0, 3);
+            return Ack();
+        }
+
+        public bool AddUserBitmapChar()
+        {
+            return false;
+        }
+
+        public bool Cls()
+        {
+            dPort.Write(new byte[] { GSGC_CLS }, 0, 1);
+            return Ack();
+        }
+
+        #region ------Drawing ------------------------------
+
+        public bool DrawPixel()
+        {
+            return false;
+        }
+
+        public bool DrawLine()
+        {
+            return false;
+        }
+
+        public bool DrawTriangle()
+        {
+            return false;
+        }
+
+        public bool DrawRectangle()
+        {
+            return false;
+        }
+
+        public bool DrawPolygon()
+        {
+            return false;
+        }
+
         public bool DrawCircle(byte x, byte y, byte r, byte[] color)
         {
             dPort.Write(new byte[] { GSGC_CIRCLE, x, y, r, color[0], color[1] }, 0, 6);
             return Ack();
         }
 
+        public bool DrawIcon()
+        {
+            return false;
+        }
+        #endregion
 
+        
         #endregion
 
         #region ------------------ Text -----------------
+        public bool SetFont()
+        {
+            return false;
+        }
 
+
+        #endregion
+
+        #region -----------------SD/SDHC Memory Card-----------------
+        #endregion
+
+        #region ------------------Script Commands(4DSL - Script Language) ------------------
         #endregion
 
         #region --------------------- Communication  ---------------------
