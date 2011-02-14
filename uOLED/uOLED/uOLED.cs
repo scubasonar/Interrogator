@@ -5,19 +5,21 @@ using Microsoft.SPOT;
 using System.IO.Ports;
 
 
-namespace uOLED
+namespace DSS.Devices
 {
-    public struct DeviceInfo
-    {
-        public byte deviceType;
-        public byte hwRev;
-        public byte firmwareRev;
-        public int hRes; // horizontal resolution
-        public int vRes; // vertical resolution
-    }
+    
 
     public class uOLED
     {
+        public struct DeviceInfo
+        {
+            public byte deviceType;
+            public byte hwRev;
+            public byte firmwareRev;
+            public int hRes; // horizontal resolution
+            public int vRes; // vertical resolution
+        }
+
         #region Command codes
 
         #region GSGC PROTOCOL CONSTANTS

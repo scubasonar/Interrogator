@@ -6,14 +6,15 @@ using Microsoft.SPOT;
 using Microsoft.SPOT.Hardware;
 
 using GHIElectronics.NETMF.FEZ;
+using DSS.Devices;
 
-namespace uOLED
+namespace uOLEDTest
 {
     public class Program
     {
         public static void Main()
         {
-            uOLED display;
+            DSS.Devices.uOLED display;
             SerialPort disp = new SerialPort("COM1", 9600);
             disp.ReadTimeout = 100;
             Random r = new Random();
@@ -23,7 +24,7 @@ namespace uOLED
             
             disp.Open();
             Thread.Sleep(50);
-            display = new uOLED(disp);
+            display = new DSS.Devices.uOLED(disp);
             display.Cls();
             Thread.Sleep(50);
             bool value = display.DrawPolygon(3, new byte[] { 32, 0, 0, 32, 50, 32}, new byte[] { 0xFF, 0xFF });

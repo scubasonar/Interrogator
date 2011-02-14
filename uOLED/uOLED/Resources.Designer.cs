@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace uOLED
+namespace DSS.Devices
 {
     
     internal partial class Resources
@@ -20,7 +20,7 @@ namespace uOLED
             {
                 if ((Resources.manager == null))
                 {
-                    Resources.manager = new System.Resources.ResourceManager("uOLED.Resources", typeof(Resources).Assembly);
+                    Resources.manager = new System.Resources.ResourceManager("DSS.Devices.Resources", typeof(Resources).Assembly);
                 }
                 return Resources.manager;
             }
