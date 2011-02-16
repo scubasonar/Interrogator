@@ -15,7 +15,7 @@ namespace uOLEDTest
         public static void Main()
         {
             DSS.Devices.uOLED display;
-            SerialPort disp = new SerialPort("COM1", 9600);
+            SerialPort disp = new SerialPort("COM2", 9600);
             disp.ReadTimeout = 100;
             Random r = new Random();
             bool ledState = false;

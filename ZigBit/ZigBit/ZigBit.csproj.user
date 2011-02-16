@@ -4,8 +4,4 @@
     <DeployTransport>USB</DeployTransport>
     <DeployDevice>USBizi</DeployDevice>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
-    <DeployTransport>USB</DeployTransport>
-    <DeployDevice>USBizi</DeployDevice>
-  </PropertyGroup>
 </Project>
