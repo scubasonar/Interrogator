@@ -12,10 +12,12 @@ namespace ZigBitTest
 {
     public class Program
     {
-        static ZigBit radio;
+        static ZigBit r;
 
         public static void Main()
         {
+            r = new ZigBit("COM2");
+            r.Ack();
             SerialPort radio = new SerialPort("COM1", 38400, Parity.None, 8);
             bool ledState = false;
             byte[] rx;
@@ -24,8 +26,9 @@ namespace ZigBitTest
 
             radio.Open();
             OutputPort led = new OutputPort((Cpu.Pin)FEZ_Pin.Digital.LED, ledState);
-
+            
             //radio init
+            radio.Write(Encoding.UTF8.GetBytes("ATE\r"), 0, 4);
             radio.Write(Encoding.UTF8.GetBytes("AT+WLEAVE\r"), 0, 10);
             Thread.Sleep(200);
             radio.Write(Encoding.UTF8.GetBytes("ATX\r\n"), 0, 5);
