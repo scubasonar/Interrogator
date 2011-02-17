@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 using System.Text;
 using System.IO.Ports;
 using Microsoft.SPOT;
@@ -86,19 +87,202 @@ namespace DSS.Devices
 
 #endregion
 
-        SerialPort radio;
+        const int INITRETRIES = 3;
 
-        public ZigBit(string comPort)
+        public enum Role
         {
-            
-            radio = new SerialPort(comPort, 38400, Parity.None, 8);
+            Coordinator, // 1 per network, manages everything
+            Router, // lots per network, should be on all the time to route end device data
+            EndDevice // intermittent opeartion
+        }
 
+        public struct Config
+        {
+            // SERIAL PORT
+            public string commPort;
+            public int baud;
+            public Parity parity;
+            public short dataBits;
+            
+            public bool connected;
+
+            // RADIO SETTINGS
+            public bool echo;
+            public ulong addrExtend; // extended address
+            public int addrShort; // short address
+            public Role role; // cole(Co-ordinator, router, end device)
+            public ulong panID; // ID for the network (all devices must have matching panID's to talk)
+        }
+
+        public SerialPort radio;
+        public Config config;
+
+        public ZigBit(string portName)
+        {
+            config = new Config();
+            config.commPort = portName;
+            config.baud = 38400;
+            config.parity = Parity.None;
+            config.dataBits = 8;
+            config.connected = false;
+            config.echo = false;
+            config.addrExtend = 1;
+            config.addrShort = 1;
+            config.role = Role.Coordinator;
+            config.panID = 1420;
+
+            if (Open())
+            {
+                if (!Init())
+                {
+                    Leave();
+                    Init();
+                }
+
+            }
+        }
+
+        public ZigBit(Config c)
+        {
+            config = c;
+            
+            if (Open())
+            {
+                if (!Init())
+                {
+                    Leave();
+                    Init();
+                }
+            }
+        }
+
+        public bool Open()
+        {
+            radio = new SerialPort(config.commPort, config.baud, config.parity, config.dataBits);
+            radio.Open();
+            return radio.IsOpen;
+        }
+
+        public bool Init()
+        {
+            config.connected = false;
+            bool success = true;
+
+            //radio init
+            success &= Echo(config.echo);
+            success &= SetAddrExt(config.addrExtend);
+            radio.Write(Encoding.UTF8.GetBytes("AT+WCHMASK=100000\r"), 0, 18);
+            success &= Ack();
+            success &= SetRole(config.role);
+            success &= SetAddrShort(config.addrShort);
+            success &= Join(config.panID);
+            radio.Write(Encoding.UTF8.GetBytes("ATX\r\n"), 0, 5);
+            success &= Ack();
+            return success;
+
+        }
+
+        
+        public bool Echo(bool on)
+        {   
+            string cmd;
+
+            if (on)
+                cmd = "AT" + CMD_ECHO + "1" + "\r";
+            else
+                cmd = "AT" + CMD_ECHO + "\r";
+
+            radio.Write(Encoding.UTF8.GetBytes(cmd), 0, cmd.Length);
+            return Ack();
+        }
+
+        public bool SetPANID(ulong id)
+        {
+            string cmd = "AT" + CMD_PANID + "=" + id.ToString() + "\r";
+            config.panID = id;
+
+
+            radio.DiscardInBuffer();
+            radio.Write(Encoding.UTF8.GetBytes(cmd), 0, cmd.Length);
+            return Ack();
+        }
+
+        // need to be disconnected from the network to use this command
+        public bool SetAddrExt(ulong addr)
+        {
+            string cmd = "AT" + CMD_ADDRE + "=" + addr.ToString() + "\r";
+            config.addrExtend = addr;
+
+            radio.DiscardInBuffer();
+            radio.Write(Encoding.UTF8.GetBytes(cmd), 0, cmd.Length);
+            return Ack();
+        }
+
+        public bool SetAddrShort(int addr)
+        {
+            string cmd = "AT" + CMD_ADDR + "=" + addr.ToString() + "\r";
+            config.addrShort = addr;
+
+            radio.DiscardInBuffer();
+            radio.Write(Encoding.UTF8.GetBytes(cmd), 0, cmd.Length);
+            return Ack();
+        }
+
+        public bool SetRole(Role r)
+        {
+            string cmd = "AT" + CMD_ROLE + "=" + r.ToString() + "\r";
+            config.role = r;
+
+            radio.DiscardInBuffer();
+            radio.Write(Encoding.UTF8.GetBytes(cmd), 0, cmd.Length); 
+            return Ack();
+        }
+
+        // Join a network after setting up all the config parameters
+        public bool Join()
+        {
+            string cmd = "AT" + CMD_JOIN + "\r";
+            if(config.connected) Leave();
+
+            radio.DiscardInBuffer();
+            radio.Write(Encoding.UTF8.GetBytes(cmd), 0, cmd.Length);
+            Thread.Sleep(2000);
+
+            config.connected = Ack();
+            return config.connected;
+        }
+
+        public bool Join(ulong panID)
+        {
+            bool success = false;
+            if (success = SetPANID(panID))
+                success &= Join();
+            return success;
+        }
+
+        // Leave a network
+        public bool Leave()
+        {
+            config.connected = false;
+
+            radio.DiscardInBuffer();
+            radio.Write(Encoding.UTF8.GetBytes("AT+WLEAVE\r"), 0, 10);
+            Thread.Sleep(2000);
+            return Ack();
         }
 
         public bool Ack()
         {
-
-            return false;
+            Thread.Sleep(20);
+            int count = radio.BytesToRead;
+            byte[] rx = new byte[count];
+            radio.Read(rx, 0, count);
+            
+            string rxS = new string(Encoding.UTF8.GetChars(rx));
+            if (rxS == "\r\nOK\r\n")
+                return true;
+            else
+                return false;
 
         }
 
