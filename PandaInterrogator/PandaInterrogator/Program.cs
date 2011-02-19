@@ -24,7 +24,7 @@ namespace PandaInterrogator
         static DateTime lastAction;
         public static void Main()
         {
-            lastAction = DateTime.Now;
+            
             ledState = false;
             sw2 = new InterruptPort((Cpu.Pin)FEZ_Pin.Interrupt.Di3, true, Port.ResistorMode.PullUp, Port.InterruptMode.InterruptEdgeLow);
             sw1 = new InputPort((Cpu.Pin)FEZ_Pin.Digital.Di2, true, Port.ResistorMode.PullUp);
@@ -46,6 +46,7 @@ namespace PandaInterrogator
             
             display.Cls();
             drawButtons();
+            lastAction = DateTime.Now;
             while (true)
             {
                 if(DateTime.Now > lastAction.AddSeconds(5))
@@ -60,22 +61,29 @@ namespace PandaInterrogator
             display.Cls();
             display.DrawString(0, 0, 0, new byte[] { 0xFF, 0xFF }, "Going to sleep");
             Thread.Sleep(250);
-            display.DrawString(0, 0, 0, new byte[] { 0xFF, 0xFF }, "Going to sleep.");
-            Thread.Sleep(250);
-            display.DrawString(0, 0, 0, new byte[] { 0xFF, 0xFF }, "Going to sleep..");
-            Thread.Sleep(250);
-            display.DrawString(0, 0, 0, new byte[] { 0xFF, 0xFF }, "Going to sleep...");
-            Thread.Sleep(250);
+            for (byte i = 0; i < 4; i++)
+            {
+                display.DrawString((byte)(14+i), 0, 0, new byte[] { 0xFF, 0xFF }, ".");
+                Thread.Sleep(250);
+            }
 
             display.Cls();
             display.ShutDown(true);
             
             led.Write(ledState = false);
+            Thread.Sleep(100);
             Power.Hibernate(Power.WakeUpInterrupt.InterruptInputs);
-
-            display.ShutDown(false);
+            //while(DateTime.Now > lastAction.AddSeconds(1));
+            Thread.Sleep(100);
+            bool success = display.ShutDown(false);
+            //Thread.Sleep(500);
             display.DrawString(0, 0, 0, new byte[] { 0xFF, 0xFF }, "Waking up.");
-            Thread.Sleep(250);
+            for (byte i = 0; i < 4; i++)
+            {
+                display.DrawString((byte)(10 + i), 0, 0, new byte[] { 0xFF, 0xFF }, ".");
+                Thread.Sleep(250);
+            }
+
             drawButtons();
         }
 

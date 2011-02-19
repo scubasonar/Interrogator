@@ -37,14 +37,10 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="uOLED.cs" />
+    <Compile Include="ZigBit.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="DSS.Devices.uOLED">
-      <HintPath>..\..\..\DSSLib_csharp\Devices\uOLED\uOLED\bin\Release\DSS.Devices.uOLED.dll</HintPath>
-    </Reference>
-    <Reference Include="DSS.Devices.ZigBit">
-      <HintPath>..\..\..\DSSLib_csharp\Devices\ZigBit\ZigBit\bin\Release\DSS.Devices.ZigBit.dll</HintPath>
-    </Reference>
     <Reference Include="FEZPanda_GHIElectronics.NETMF.FEZ, Version=4.1.1.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <Private>False</Private>
