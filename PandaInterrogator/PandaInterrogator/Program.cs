@@ -21,6 +21,8 @@ namespace PandaInterrogator
         static InterruptPort sw2;
         static OutputPort led;
         static bool ledState;
+        static bool connected;
+
         static DateTime lastAction;
         public static void Main()
         {
@@ -39,17 +41,25 @@ namespace PandaInterrogator
             led = new OutputPort((Cpu.Pin)FEZ_Pin.Digital.LED, ledState);
             display = new uOLED(new SerialPort("COM2", 115200));
             display.ShutDown(false);
+            display.UpdateDeviceInfo(true);
 
             Thread.Sleep(500);
             ZigBit radio = new ZigBit("COM1");
             Random r = new Random();
-            
+
             display.Cls();
-            drawButtons();
             lastAction = DateTime.Now;
             while (true)
             {
-                if(DateTime.Now > lastAction.AddSeconds(5))
+                connected = radio.CheckStatus();
+                if (connected)
+                    display.DrawRectangle((byte)(display.dInfo.hRes - 20), 100, (byte)(display.dInfo.hRes-10), 110, new byte[] { 0xCC, 0x00 });
+                else
+                {
+                    radio.Join();
+                    display.DrawRectangle((byte)(display.dInfo.hRes), 0, (byte)(display.dInfo.hRes - 10), 10, new byte[] { 0xEE, 0x33 });
+                }
+                if(DateTime.Now > lastAction.AddSeconds(30))
                     screenSaver();
                 Thread.Sleep(500);
             }
