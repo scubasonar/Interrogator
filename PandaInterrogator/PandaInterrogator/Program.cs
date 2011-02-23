@@ -59,9 +59,13 @@ namespace PandaInterrogator
                         display.DrawString(0, 0, 0, new byte[] { 0xFF, 0xFF }, radio.children.Count.ToString());
                         if (radio.children.Count > 0)
                         {
+
+                          
                             display.DrawString(0, 2, 0, new byte[] { 0xFF, 0xFF }, "--Connected devices--");
                             for(int i = 0; i < radio.children.Count; i++)
                                 display.DrawString(0, (byte)(i+3), 0, new byte[] { 0xFF, 0xFF }, radio.children[i].ToString() );
+
+                            radio.Write((ulong)radio.children[0], "test1234", false);
                         }
 
                         Thread.Sleep(500);

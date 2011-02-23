@@ -268,6 +268,16 @@ namespace DSS.Devices
             //throw new NotImplementedException();
         }
 
+        public bool Write(ulong destination, string data, bool ack)
+        {
+            string cmd = "AT" + CMD_TX + destination + "\r" + data + "\r";
+            radio.DiscardInBuffer();
+            radio.DiscardOutBuffer();
+
+            radio.Write(UTF8Encoding.UTF8.GetBytes(cmd), 0, cmd.Length);
+            return Ack();
+        }
+
         void ParseCmd()
         {
             string cmd = new string(UTF8Encoding.UTF8.GetChars(rx));
@@ -428,6 +438,8 @@ namespace DSS.Devices
             success &= Join(config.panID);
             radio.Write(Encoding.UTF8.GetBytes("ATX\r\n"), 0, 5);
             success &= Ack();
+            radio.Write(Encoding.UTF8.GetBytes("ATS30=1\r"), 0, 8);
+            success &= Ack();
           /*  cmd = "AT" + CMD_RETRY + " " + config.retries + "\r\n";
             radio.Write(Encoding.UTF8.GetBytes(cmd), 0, cmd.Length);
             success &= Ack();*/
@@ -518,7 +530,6 @@ namespace DSS.Devices
 
             radio.DiscardInBuffer();
             radio.Write(Encoding.UTF8.GetBytes(cmd), 0, cmd.Length);
-            Thread.Sleep(2000);
 
             config.connected = Ack();
             return config.connected;
