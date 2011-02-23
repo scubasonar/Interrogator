@@ -235,7 +235,7 @@ namespace DSS.Devices
 
             Debug.Print(cmd);
             
-            args = cmd.Split(new char[] { ':' });
+            args = cmd.Split(new char[] { ':', ' ' });
             switch (args[0])
             {
                 case "ERROR":
@@ -249,42 +249,62 @@ namespace DSS.Devices
                     GotACK = true;
                     break;
                 case "EVENT":
-                    processEvent(args[1]);
+                    processEvent(args);
+                    break;
+                case "DATA":
+                    processData(args);
                     break;
                 case "+WCHILDREN":
-                    if (args[1] == "")
-                    {
-                        children.Clear();
-                        break;
-                    }
-                    string[] childs = args[1].Split(new char[] { ',' });
-                    ulong[] childIDs = new ulong[childs.Length];
-
-                    for(int i = 0; i < childs.Length; i++)
-                    {
-                        childIDs[i] = ulong.Parse(childs[i]);
-                    }
-
-                    foreach (object ID in children)
-                    {
-                        try
-                        {
-                            bool match = false;
-                            for (int i = 0; i < childIDs.Length; i++)
-                                if (childIDs[i] == (ulong)ID) match = true;
-                            if (!match) children.Remove(ID);
-                        }
-                        catch
-                        {
-                        }
-                    }
-                    
-                    LastCmd = args[0];
+                    processChildren(args);
                     break;
                 default:
                     break;
             }
             rxcnt = 0;
+            return;
+        }
+
+        void processChildren(string[] args)
+        {
+            if (args[1] == "")
+            {
+                children.Clear();
+                return;
+            }
+
+            string[] childs = args[1].Split(new char[] { ',' });
+            ulong[] childIDs = new ulong[childs.Length];
+
+            for (int i = 0; i < childs.Length; i++)
+            {
+                childIDs[i] = ulong.Parse(childs[i]);
+                if (!children.Contains(childIDs[i]))
+                    children.Add(childIDs[i]);
+            }
+
+            foreach (object ID in children)
+            {
+                try
+                {
+                    bool match = false;
+                    for (int i = 0; i < childIDs.Length; i++)
+                        if (childIDs[i] == (ulong)ID) match = true;
+                    if (!match) children.Remove(ID);
+                }
+                catch
+                {
+                }
+            }
+
+            LastCmd = args[0];
+        }
+
+        void processData(string[] raw)
+        {
+            string[] args = raw[1].Split(new char[] { ',' });
+            string data = raw[2];
+            
+            
             return;
         }
 
@@ -317,18 +337,25 @@ namespace DSS.Devices
             }*/
         }
 
-        void processEvent(string e)
+        void processEvent(string[] args)
         {
-            string[] args = e.Split(new char[] { ' ' });
-            switch (args[0])
+            //string[] args = e.Split(new char[] { ' ' });
+            switch (args[1])
             {
                 case "CHILD_JOINED": // check if the child already exists and if not add him to the list
-                    ulong ID = ulong.Parse(args[1]);
-                    if (children.Contains(ID)) 
-                        return;
-                    else
-                        children.Add(ID);
-                    break;
+                    try
+                    {
+                        ulong ID = ulong.Parse(args[2]);
+                        if (children.Contains(ID))
+                            return;
+                        else
+                            children.Add(ID);
+                        break;
+                    }
+                    catch
+                    {
+                        break;
+                    }
                 default:
                     break;
 
