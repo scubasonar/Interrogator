@@ -230,6 +230,8 @@ namespace DSS.Devices
             }
         }
 
+        
+
         public bool Open()
         {
             radio = new SerialPort(config.commPort, config.baud, config.parity, config.dataBits);
@@ -241,9 +243,33 @@ namespace DSS.Devices
             return radio.IsOpen;
         }
 
-        void processCommand()
+        void radio_DataReceived(object sender, SerialDataReceivedEventArgs e)
         {
-            int test;
+            SerialPort port = (SerialPort)sender;
+            byte[] _rx = new byte[port.BytesToRead];
+            port.Read(_rx, 0, _rx.Length);
+
+            for (int i = 0; i < _rx.Length; i++)
+            {
+                switch (_rx[i])
+                {
+                    case (byte)'\r':
+                        ParseCmd();
+                        break;
+                    case (byte)'\n':
+                        break;
+                    default:
+                        rx[rxcnt++] = _rx[i];
+                        if (rxcnt > rx.Length) rxcnt = 0;
+                        break;
+                }
+            }
+
+            //throw new NotImplementedException();
+        }
+
+        void ParseCmd()
+        {
             string cmd = new string(UTF8Encoding.UTF8.GetChars(rx));
             
             string[] args;
@@ -272,13 +298,13 @@ namespace DSS.Devices
                     GotACK = true;
                     break;
                 case "EVENT":
-                    processEvent(args);
+                    ProcessEvent(args);
                     break;
                 case "DATA":
-                    processData(args);
+                    ProcessData(cmd);
                     break;
                 case "+WCHILDREN":
-                    processChildren(args);
+                    ProcessChildren(args);
                     break;
                 default:
                     break;
@@ -287,7 +313,7 @@ namespace DSS.Devices
             return;
         }
 
-        void processChildren(string[] args)
+        void ProcessChildren(string[] args)
         {
             if (args[1] == "")
             {
@@ -322,18 +348,7 @@ namespace DSS.Devices
             LastCmd = args[0];
         }
 
-        void processData(string[] raw)
-        {
-            string[] args = raw[1].Split(new char[] { ',' });
-            string data = raw[2];
-            
-            ushort source = ushort.Parse(args[0]);
-            On_dataRX(new ZigBitDataRXEventArgs(source, data));
-            
-            return;
-        }
-
-        void updateChildren()
+        void UpdateChildren()
         {
             string cmd;
             DateTime start = DateTime.Now;
@@ -362,7 +377,16 @@ namespace DSS.Devices
             }*/
         }
 
-        void processEvent(string[] args)
+        void ProcessData(string raw)
+        {
+            string[] separate = raw.Split(new char[] { ':' });
+            string header = separate[0].TrimStart(new char[] { 'D', 'A', 'T', 'A', ' ' });
+            string[] headerparts = header.Split(new char[] { ',' });
+            On_dataRX(new ZigBitDataRXEventArgs(ushort.Parse(headerparts[0]), separate[1]));
+            return;
+        }
+
+        void ProcessEvent(string[] args)
         {
             //string[] args = e.Split(new char[] { ' ' });
             switch (args[1])
@@ -386,31 +410,6 @@ namespace DSS.Devices
 
             }
             return;
-        }
-
-        void radio_DataReceived(object sender, SerialDataReceivedEventArgs e)
-        {
-            SerialPort port = (SerialPort)sender;
-            byte[] _rx = new byte[port.BytesToRead];
-            port.Read(_rx, 0, _rx.Length);
-
-            for (int i = 0; i < _rx.Length; i++)
-            {
-                switch (_rx[i])
-                {
-                    case (byte)'\r':
-                        processCommand();
-                        break;
-                    case (byte)'\n':
-                        break;
-                    default:
-                        rx[rxcnt++] = _rx[i];
-                        if (rxcnt > rx.Length) rxcnt = 0;
-                        break;
-                }
-            }
-            
-            //throw new NotImplementedException();
         }
 
         public bool Init()
@@ -439,7 +438,7 @@ namespace DSS.Devices
         public bool CheckStatus()
         {
             string cmd = "AT" + CMD_STATUS + "\r";
-            updateChildren();
+            UpdateChildren();
             radio.DiscardInBuffer();
             radio.Write(Encoding.UTF8.GetBytes(cmd), 0, cmd.Length);
             return Ack();
@@ -458,6 +457,8 @@ namespace DSS.Devices
             return Ack();
         }
 
+        #region ---------RADIO SETTINGS -----------
+
         public bool SetPANID(ulong id)
         {
             string cmd = "AT" + CMD_PANID + "=" + id.ToString() + "\r";
@@ -468,7 +469,6 @@ namespace DSS.Devices
             radio.Write(Encoding.UTF8.GetBytes(cmd), 0, cmd.Length);
             return Ack();
         }
-
         // need to be disconnected from the network to use this command
         public bool SetAddrExt(ulong addr)
         {
@@ -500,6 +500,8 @@ namespace DSS.Devices
             return Ack();
         }
 
+        #endregion
+
         public bool Ping(int addr)
         {
             string cmd = "AT" + CMD_PING + " " + addr.ToString();
@@ -507,6 +509,7 @@ namespace DSS.Devices
             return Ack();
         }
 
+        #region ------------NETWORK CONTROL-----------
         // Join a network after setting up all the config parameters
         public bool Join()
         {
@@ -538,6 +541,7 @@ namespace DSS.Devices
             radio.Write(Encoding.UTF8.GetBytes("AT+WLEAVE\r"), 0, 10);
             return Ack();
         }
+        #endregion
 
         public bool Ack()
         {

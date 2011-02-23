@@ -30,14 +30,10 @@ namespace PandaInterrogator
             ledState = false;
             sw2 = new InterruptPort((Cpu.Pin)FEZ_Pin.Interrupt.Di3, true, Port.ResistorMode.PullUp, Port.InterruptMode.InterruptEdgeLow);
             sw1 = new InputPort((Cpu.Pin)FEZ_Pin.Digital.Di2, true, Port.ResistorMode.PullUp);
-            //sw2 = new InputPort((Cpu.Pin)FEZ_Pin.Digital.Di3, true, Port.ResistorMode.PullUp);
-            //InterruptPort sw1 = new InterruptPort((Cpu.Pin)FEZ_Pin.Digital.Di2, false, Port.ResistorMode.PullUp, Port.InterruptMode.InterruptEdgeLevelLow);
-            //sw1.OnInterrupt += new NativeEventHandler(sw1_OnInterrupt);
-            //sw3.EnableInterrupt();
             sw2.OnInterrupt += sw2_OnInterrupt;
-            Cpu.GlitchFilterTime = new TimeSpan(0, 0, 0, 0, 200);
             sw2.EnableInterrupt();
-
+            Cpu.GlitchFilterTime = new TimeSpan(0, 0, 0, 0, 200);
+            
             led = new OutputPort((Cpu.Pin)FEZ_Pin.Digital.LED, ledState);
             display = new uOLED(new SerialPort("COM2", 115200));
             display.ShutDown(false);
@@ -49,19 +45,16 @@ namespace PandaInterrogator
             radio.dataRX += new EventHandler(radio_dataRX);
             display.Cls();
             lastAction = DateTime.Now;
+            
             while (true)
             {
                 connected = radio.CheckStatus();
                 if (connected)
                 {
-                    
-                    //radio.radio.DataReceived += new SerialDataReceivedEventHandler(radio_DataReceived);
                     while (connected)
                     {
                         display.Cls();
                         display.DrawRectangle((byte)(display.dInfo.hRes), 0, (byte)(display.dInfo.hRes - 10), 10, new byte[] { 0x07, 0xE0 });
-                        //radio.radio.DataReceived -= radio_DataReceived;
-                        
                         
                         display.DrawString(0, 0, 0, new byte[] { 0xFF, 0xFF }, radio.children.Count.ToString());
                         if (radio.children.Count > 0)
@@ -71,20 +64,15 @@ namespace PandaInterrogator
                                 display.DrawString(0, (byte)(i+3), 0, new byte[] { 0xFF, 0xFF }, radio.children[i].ToString() );
                         }
 
-                        //radio.radio.DataReceived += radio_DataReceived;
                         Thread.Sleep(500);
                         connected = radio.CheckStatus();
                     }
-                    //radio.radio.DataReceived -= radio_DataReceived;
                 }
                 else
                 {
                     radio.Join();
                     display.DrawRectangle((byte)(display.dInfo.hRes), 0, (byte)(display.dInfo.hRes - 10), 10, new byte[] { 0xF8, 0x00 });
                 }
-                //if(DateTime.Now > lastAction.AddSeconds(30))
-                //    screenSaver();
-                //Thread.Sleep(500);
             }
         }
 
