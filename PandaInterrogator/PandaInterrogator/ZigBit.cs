@@ -5,9 +5,22 @@ using System.IO.Ports;
 using Microsoft.SPOT;
 using System.Collections;
 
+
 namespace DSS.Devices
 {
-    
+
+    public class ZigBitDataRXEventArgs : EventArgs
+    {
+        public readonly ushort source;
+        public readonly string data;
+
+        public ZigBitDataRXEventArgs(ushort _source, string _data)
+        {
+            source = _source;
+            data = _data;
+        }
+    }
+
     // ZigBit Serial Net
     public class ZigBit
     {
@@ -90,6 +103,16 @@ namespace DSS.Devices
 
 
 #endregion
+
+        #region----------------------------------------- EVENTS -------------------------------------------------------------------------
+        public event EventHandler dataRX;
+        
+        protected virtual void On_dataRX(ZigBitDataRXEventArgs e)
+        {
+            if (dataRX != null) dataRX(this, e);
+        }
+
+        #endregion
 
         const int INITRETRIES = 3;
 
@@ -304,6 +327,8 @@ namespace DSS.Devices
             string[] args = raw[1].Split(new char[] { ',' });
             string data = raw[2];
             
+            ushort source = ushort.Parse(args[0]);
+            On_dataRX(new ZigBitDataRXEventArgs(source, data));
             
             return;
         }

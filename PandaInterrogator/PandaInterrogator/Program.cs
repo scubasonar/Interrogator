@@ -22,7 +22,7 @@ namespace PandaInterrogator
         static OutputPort led;
         static bool ledState;
         static bool connected;
-
+        
         static DateTime lastAction;
         public static void Main()
         {
@@ -46,23 +46,70 @@ namespace PandaInterrogator
             Thread.Sleep(500);
             ZigBit radio = new ZigBit("COM1");
             Random r = new Random();
-
+            radio.dataRX += new EventHandler(radio_dataRX);
             display.Cls();
             lastAction = DateTime.Now;
             while (true)
             {
                 connected = radio.CheckStatus();
                 if (connected)
-                    display.DrawRectangle((byte)(display.dInfo.hRes - 20), 100, (byte)(display.dInfo.hRes-10), 110, new byte[] { 0xCC, 0x00 });
+                {
+                    
+                    //radio.radio.DataReceived += new SerialDataReceivedEventHandler(radio_DataReceived);
+                    while (connected)
+                    {
+                        display.Cls();
+                        display.DrawRectangle((byte)(display.dInfo.hRes), 0, (byte)(display.dInfo.hRes - 10), 10, new byte[] { 0x07, 0xE0 });
+                        //radio.radio.DataReceived -= radio_DataReceived;
+                        
+                        
+                        display.DrawString(0, 0, 0, new byte[] { 0xFF, 0xFF }, radio.children.Count.ToString());
+                        if (radio.children.Count > 0)
+                        {
+                            display.DrawString(0, 2, 0, new byte[] { 0xFF, 0xFF }, "--Connected devices--");
+                            for(int i = 0; i < radio.children.Count; i++)
+                                display.DrawString(0, (byte)(i+3), 0, new byte[] { 0xFF, 0xFF }, radio.children[i].ToString() );
+                        }
+
+                        //radio.radio.DataReceived += radio_DataReceived;
+                        Thread.Sleep(500);
+                        connected = radio.CheckStatus();
+                    }
+                    //radio.radio.DataReceived -= radio_DataReceived;
+                }
                 else
                 {
                     radio.Join();
-                    display.DrawRectangle((byte)(display.dInfo.hRes), 0, (byte)(display.dInfo.hRes - 10), 10, new byte[] { 0xEE, 0x33 });
+                    display.DrawRectangle((byte)(display.dInfo.hRes), 0, (byte)(display.dInfo.hRes - 10), 10, new byte[] { 0xF8, 0x00 });
                 }
-                if(DateTime.Now > lastAction.AddSeconds(30))
-                    screenSaver();
-                Thread.Sleep(500);
+                //if(DateTime.Now > lastAction.AddSeconds(30))
+                //    screenSaver();
+                //Thread.Sleep(500);
             }
+        }
+
+        static void radio_dataRX(object sender, EventArgs e)
+        {
+            ZigBitDataRXEventArgs args = (ZigBitDataRXEventArgs)e;
+            display.DrawString(0, 5, 0, new byte[] { 0xFF, 0xFF }, "RX: " + args.source + "," + args.data);
+            Thread.Sleep(1000);
+        }
+
+        static void radio_dataRX(object sender, ZigBitDataRXEventArgs e)
+        {
+            display.DrawString(0,5,0, new byte[] {0xFF, 0xFF}, "RX: " + e.source + "," + e.data);
+            Thread.Sleep(1000);
+        }
+
+        static void radio_DataReceived(object sender, SerialDataReceivedEventArgs e)
+        {
+            SerialPort radio = (SerialPort)sender;
+            byte[] rx = new byte[radio.BytesToRead];
+            string rxs;
+
+            radio.Read(rx, 0, rx.Length);
+            rxs = new string(UTF8Encoding.UTF8.GetChars(rx));
+            Debug.Print(rxs);
         }
 
         static void screenSaver()

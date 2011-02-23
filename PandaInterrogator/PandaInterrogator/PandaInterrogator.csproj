@@ -53,6 +53,7 @@
     <Reference Include="Microsoft.SPOT.Hardware.SerialPort" />
     <Reference Include="Microsoft.SPOT.Native">
     </Reference>
+    <Reference Include="Microsoft.SPOT.TinyCore" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources.resx">

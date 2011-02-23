@@ -34,15 +34,15 @@ namespace DSS.Devices
         #endregion
 
         #region GSGC GRAPHICS CONSTANTS
-        const  byte COLOR8 = 0x08; // 8 bit Colour Mode
-        const  byte COLOR16 = 0x10; // 16 bit Colour Mode
-        const  byte BUTTONUP = 0x01; // Button Up Mode
-        const  byte BUTTONDOWN = 0x00; // Button Down Mode
-        const  int RED = 0xF800; // RED
-        const  int GREEN = 0x07E0; // GREEN
-        const  int BLUE = 0x001F; // BLUE
-        const  int BLACK = 0x0000; // BLACK
-        const int WHITE = 0xFFFF; // WHITE
+        public const  byte COLOR8 = 0x08; // 8 bit Colour Mode
+        public const byte COLOR16 = 0x10; // 16 bit Colour Mode
+        public const byte BUTTONUP = 0x01; // Button Up Mode
+        public const byte BUTTONDOWN = 0x00; // Button Down Mode
+        public const int RED = 0xF800 ; // red
+        public const int GREEN = 0x07E0; // GREEN
+        public const int BLUE = 0x001F; // BLUE
+        public const int BLACK = 0x0000; // BLACK
+        public const int WHITE = 0xFFFF; // WHITE
         #endregion
 
 
