@@ -3,12 +3,16 @@ using System.Threading;
 using System.Text;
 using System.IO.Ports;
 using Microsoft.SPOT;
+using System.Collections;
 
 namespace DSS.Devices
 {
+    
     // ZigBit Serial Net
     public class ZigBit
     {
+        public ArrayList children;
+
 #region ----------------------------------------- COMMANDS  ------------------------------------------------------------------------- 
         //----------------Networking Prameters--------------------
         const string CMD_PANID = "+WPANID"; // Extended PAN ID
@@ -89,6 +93,50 @@ namespace DSS.Devices
 
         const int INITRETRIES = 3;
 
+        byte[] rx = new byte[256];
+        byte rxcnt = 0;
+
+        public string LastCmd = "";
+        bool _GotResponse = false;
+        public bool GotResponse
+        {
+            get
+            {
+                if (_GotResponse)
+                {
+                    _GotResponse = false;
+                    return true;
+                }
+                return false;
+            }
+
+            set
+            {
+                _GotResponse = value;
+            }
+        }
+
+        bool _GotACK = false;
+        // ack flag that gets cleared on read
+        public bool GotACK
+        {
+            get
+            {
+                if (_GotACK)
+                {
+                    _GotACK = false;
+                    return true;
+                }
+                return false;
+            }
+
+            set
+            {
+                _GotACK = value;
+            }
+        }
+
+
         public enum Role
         {
             Coordinator, // 1 per network, manages everything
@@ -112,6 +160,7 @@ namespace DSS.Devices
             public int addrShort; // short address
             public Role role; // cole(Co-ordinator, router, end device)
             public ulong panID; // ID for the network (all devices must have matching panID's to talk)
+            public int retries; // number of tries to do things like ping
         }
 
         public SerialPort radio;
@@ -119,6 +168,7 @@ namespace DSS.Devices
 
         public ZigBit(string portName)
         {
+            children = new ArrayList();
             config = new Config();
             config.commPort = portName;
             config.baud = 38400;
@@ -128,9 +178,10 @@ namespace DSS.Devices
             config.echo = false;
             config.addrExtend = 1;
             config.addrShort = 1;
-            config.role = Role.Router;
+            config.role = Role.Coordinator;
             config.panID = 1620;
-
+            config.retries = 2;
+           
             if (Open())
             {
                 if (!Init())
@@ -160,13 +211,161 @@ namespace DSS.Devices
         {
             radio = new SerialPort(config.commPort, config.baud, config.parity, config.dataBits);
             radio.Open();
+            if (radio.IsOpen)
+            {
+                radio.DataReceived += new SerialDataReceivedEventHandler(radio_DataReceived);
+            }
             return radio.IsOpen;
+        }
+
+        void processCommand()
+        {
+            int test;
+            string cmd = new string(UTF8Encoding.UTF8.GetChars(rx));
+            
+            string[] args;
+            try
+            {
+                cmd = cmd.Substring(0, rxcnt);
+            }
+            catch
+            {
+                return;
+            }
+
+            Debug.Print(cmd);
+            
+            args = cmd.Split(new char[] { ':' });
+            switch (args[0])
+            {
+                case "ERROR":
+                    GotResponse = true;
+                    LastCmd = args[0];
+                    GotACK = false;
+                    break;
+                case "OK":
+                    GotResponse = true;
+                    LastCmd = args[0];
+                    GotACK = true;
+                    break;
+                case "EVENT":
+                    processEvent(args[1]);
+                    break;
+                case "+WCHILDREN":
+                    if (args[1] == "")
+                    {
+                        children.Clear();
+                        break;
+                    }
+                    string[] childs = args[1].Split(new char[] { ',' });
+                    ulong[] childIDs = new ulong[childs.Length];
+
+                    for(int i = 0; i < childs.Length; i++)
+                    {
+                        childIDs[i] = ulong.Parse(childs[i]);
+                    }
+
+                    foreach (object ID in children)
+                    {
+                        try
+                        {
+                            bool match = false;
+                            for (int i = 0; i < childIDs.Length; i++)
+                                if (childIDs[i] == (ulong)ID) match = true;
+                            if (!match) children.Remove(ID);
+                        }
+                        catch
+                        {
+                        }
+                    }
+                    
+                    LastCmd = args[0];
+                    break;
+                default:
+                    break;
+            }
+            rxcnt = 0;
+            return;
+        }
+
+        void updateChildren()
+        {
+            string cmd;
+            DateTime start = DateTime.Now;
+            cmd = "AT" + CMD_CHILD + "?\r";
+            radio.Write(UTF8Encoding.UTF8.GetBytes(cmd), 0, cmd.Length);
+            Ack();
+            return;
+            /*
+            if (children.Count == 0) return;
+
+            for (int i = 0; i < children.Count; i++)
+            {
+                cmd = "AT" + CMD_PING + children[i] + "\r";
+                radio.Write(UTF8Encoding.UTF8.GetBytes(cmd), 0, cmd.Length);
+                while (!GotResponse)
+                {
+                    if (DateTime.Now > (start.AddSeconds(30)))
+                    {
+                        children.RemoveAt(i);
+                        if (children.Count == 0) return;
+                        i--;
+                        break;
+                    }
+                    Thread.Sleep(100);
+                }
+            }*/
+        }
+
+        void processEvent(string e)
+        {
+            string[] args = e.Split(new char[] { ' ' });
+            switch (args[0])
+            {
+                case "CHILD_JOINED": // check if the child already exists and if not add him to the list
+                    ulong ID = ulong.Parse(args[1]);
+                    if (children.Contains(ID)) 
+                        return;
+                    else
+                        children.Add(ID);
+                    break;
+                default:
+                    break;
+
+            }
+            return;
+        }
+
+        void radio_DataReceived(object sender, SerialDataReceivedEventArgs e)
+        {
+            SerialPort port = (SerialPort)sender;
+            byte[] _rx = new byte[port.BytesToRead];
+            port.Read(_rx, 0, _rx.Length);
+
+            for (int i = 0; i < _rx.Length; i++)
+            {
+                switch (_rx[i])
+                {
+                    case (byte)'\r':
+                        processCommand();
+                        break;
+                    case (byte)'\n':
+                        break;
+                    default:
+                        rx[rxcnt++] = _rx[i];
+                        if (rxcnt > rx.Length) rxcnt = 0;
+                        break;
+                }
+            }
+            
+            //throw new NotImplementedException();
         }
 
         public bool Init()
         {
             config.connected = false;
             bool success = true;
+            string cmd;
 
             //radio init
             success &= Echo(config.echo);
@@ -178,6 +377,9 @@ namespace DSS.Devices
             success &= Join(config.panID);
             radio.Write(Encoding.UTF8.GetBytes("ATX\r\n"), 0, 5);
             success &= Ack();
+          /*  cmd = "AT" + CMD_RETRY + " " + config.retries + "\r\n";
+            radio.Write(Encoding.UTF8.GetBytes(cmd), 0, cmd.Length);
+            success &= Ack();*/
             return success;
 
         }
@@ -185,6 +387,7 @@ namespace DSS.Devices
         public bool CheckStatus()
         {
             string cmd = "AT" + CMD_STATUS + "\r";
+            updateChildren();
             radio.DiscardInBuffer();
             radio.Write(Encoding.UTF8.GetBytes(cmd), 0, cmd.Length);
             return Ack();
@@ -245,6 +448,13 @@ namespace DSS.Devices
             return Ack();
         }
 
+        public bool Ping(int addr)
+        {
+            string cmd = "AT" + CMD_PING + " " + addr.ToString();
+            radio.Write(Encoding.UTF8.GetBytes(cmd), 0, cmd.Length);
+            return Ack();
+        }
+
         // Join a network after setting up all the config parameters
         public bool Join()
         {
@@ -274,23 +484,19 @@ namespace DSS.Devices
 
             radio.DiscardInBuffer();
             radio.Write(Encoding.UTF8.GetBytes("AT+WLEAVE\r"), 0, 10);
-            Thread.Sleep(2000);
             return Ack();
         }
 
         public bool Ack()
         {
-            Thread.Sleep(20);
-            int count = radio.BytesToRead;
-            byte[] rx = new byte[count];
-            radio.Read(rx, 0, count);
-            
-            string rxS = new string(Encoding.UTF8.GetChars(rx));
-            if (rxS == "\r\nOK\r\n")
-                return true;
-            else
-                return false;
+            DateTime start = DateTime.Now;
+            while (!GotResponse)
+            {
+                if (DateTime.Now > start.AddSeconds(5))
+                    return false;
+            }
 
+            return GotACK;
         }
 
     }
