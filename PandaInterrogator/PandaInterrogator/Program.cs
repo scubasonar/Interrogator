@@ -56,14 +56,15 @@ namespace PandaInterrogator
                         display.Cls();
                         display.DrawRectangle((byte)(display.dInfo.hRes), 0, (byte)(display.dInfo.hRes - 10), 10, new byte[] { 0x07, 0xE0 });
                         
-                        display.DrawString(0, 0, 0, new byte[] { 0xFF, 0xFF }, radio.children.Count.ToString());
+                        display.DrawString(0, 0, 0, new byte[] { 0xFF, 0xFF }, "Nodes: " + radio.children.Count.ToString());
                         if (radio.children.Count > 0)
                         {
 
-                          
-                            display.DrawString(0, 2, 0, new byte[] { 0xFF, 0xFF }, "--Connected devices--");
+                            display.DrawString(0, 2, 0, new byte[] { 0xFF, 0xFF }, "---------------------");
+                            display.DrawString(0, 3, 0, new byte[] { 0xFF, 0xFF }, "--Connected devices--");
+                            display.DrawString(0, 4, 0, new byte[] { 0xFF, 0xFF }, "---------------------");
                             for(int i = 0; i < radio.children.Count; i++)
-                                display.DrawString(0, (byte)(i+3), 0, new byte[] { 0xFF, 0xFF }, radio.children[i].ToString() );
+                                display.DrawString(0, (byte)(i+5), 0, new byte[] { 0xFF, 0xFF },"#"+(i+1)+": "+ radio.children[i].ToString() );
 
                             radio.Write((ulong)radio.children[0], "test1234", false);
                         }
