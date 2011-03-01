@@ -24,6 +24,10 @@ namespace PandaInterrogator
         static bool connected;
         
         static DateTime lastAction;
+        static Menu mainMenu;
+        static Menu aboutMenu; 
+        static Menu currentMenu;
+
         public static void Main()
         {
             SerialPort d = new SerialPort("COM4", 115200, Parity.None, 8, StopBits.One);
@@ -43,7 +47,8 @@ namespace PandaInterrogator
             sw1 = new InterruptPort((Cpu.Pin)FEZ_Pin.Interrupt.Di7, true, Port.ResistorMode.PullUp, Port.InterruptMode.InterruptEdgeLow);
             sw2 = new InterruptPort((Cpu.Pin)FEZ_Pin.Interrupt.Di8, true, Port.ResistorMode.PullUp, Port.InterruptMode.InterruptEdgeLow);
             
-            
+            sw1.OnInterrupt += sw1_OnInterrupt;
+            sw1.EnableInterrupt();
             sw2.OnInterrupt += sw2_OnInterrupt;
             sw2.EnableInterrupt();
             Cpu.GlitchFilterTime = new TimeSpan(0, 0, 0, 0, 200);
@@ -60,10 +65,18 @@ namespace PandaInterrogator
             radio.dataRX += new EventHandler(radio_dataRX);
             display.Cls();
             lastAction = DateTime.Now;
+
             
+            mainMenu = new Menu(new string[] { "Start Network", "About", "Shutdown" }, display);
+            currentMenu = mainMenu;
+            aboutMenu = new Menu(new string[] { "Hello", "test!" }, display);
+            mainMenu.subMenus = new Menu[] {new Menu(new string[] {"test1, test2"}, display), aboutMenu, new Menu(new string[] {"test3", "test4"}, display)};
+            mainMenu.subMenus[1] = aboutMenu;
+            mainMenu.draw();
             while (true)
             {
-                connected = radio.CheckStatus();
+                
+                /*connected = radio.CheckStatus();
                 if (connected)
                 {
                     while (connected)
@@ -93,6 +106,9 @@ namespace PandaInterrogator
                     radio.Join();
                     display.DrawRectangle((byte)(display.dInfo.hRes), 0, (byte)(display.dInfo.hRes - 10), 10, new byte[] { 0xF8, 0x00 });
                 }
+            }*/
+
+                Thread.Sleep(200);
             }
         }
 
@@ -154,13 +170,15 @@ namespace PandaInterrogator
 
         static void sw2_OnInterrupt(uint data1, uint data2, DateTime time)
         {
-            
+            /*
             byte last = selectedButton;
             selectedButton++;
             if (selectedButton > 8) selectedButton = 0;
             updateButtons(last, selectedButton);
 
             led.Write(ledState = !ledState);
+            */
+            currentMenu.selectionChanged((byte)(mainMenu.selected + 1));
 
             lastAction = DateTime.Now;
             return;
@@ -201,8 +219,11 @@ namespace PandaInterrogator
 
         static void sw1_OnInterrupt(uint data1, uint data2, DateTime time)
         {
+            currentMenu.clear();
             
-            throw new NotImplementedException();
+            currentMenu = currentMenu.subMenus[selectedButton];
+            currentMenu.draw();
+            //throw new NotImplementedException();
         }
 
        

@@ -38,11 +38,11 @@ namespace DSS.Devices
         public const byte COLOR16 = 0x10; // 16 bit Colour Mode
         public const byte BUTTONUP = 0x01; // Button Up Mode
         public const byte BUTTONDOWN = 0x00; // Button Down Mode
-        public const int RED = 0xF800 ; // red
+      /*  public const int RED = 0xF800 ; // red
         public const int GREEN = 0x07E0; // GREEN
         public const int BLUE = 0x001F; // BLUE
         public const int BLACK = 0x0000; // BLACK
-        public const int WHITE = 0xFFFF; // WHITE
+        public const int WHITE = 0xFFFF; // WHITE*/
         #endregion
 
 
@@ -118,6 +118,24 @@ namespace DSS.Devices
         #endregion
 
         #endregion
+
+        public struct Color
+        {
+            public byte msb;
+            public byte lsb;
+
+            public Color(byte Msb, byte Lsb)
+            {
+                msb = Msb;
+                lsb = Lsb;
+            }
+        }
+
+        public static Color RED = new Color(0xF8, 0x00);
+        public static Color BLUE = new Color(0x00, 0x1F);
+        public static Color GREEN = new Color(0x07, 0xE0);
+        public static Color BLACK = new Color(0x00, 0x00);
+        public static Color WHITE = new Color(0xFF, 0xFF);
 
         public DeviceInfo dInfo;
         SerialPort dPort;
@@ -477,6 +495,11 @@ namespace DSS.Devices
 
 
             return Ack();
+        }
+
+        public bool DrawButtonTXT(byte state, byte x, byte y, Color btnColor, byte font, Color strColor, byte width, byte height, string s)
+        {
+            return DrawButtonTXT(state, x, y, new byte[] { btnColor.msb, btnColor.lsb }, font, new byte[] { strColor.msb, strColor.lsb }, width, height, s);
         }
 
        

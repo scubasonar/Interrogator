@@ -1,0 +1,46 @@
+C:\Users\Matt\AppData\Local\Temporary Projects\C328V_Camera\bin\Debug\le\FEZ Panda Application.exe
+C:\Users\Matt\AppData\Local\Temporary Projects\C328V_Camera\bin\Debug\be\FEZ Panda Application.exe
+C:\Users\Matt\AppData\Local\Temporary Projects\C328V_Camera\bin\Debug\le\FEZ Panda Application.pdb
+C:\Users\Matt\AppData\Local\Temporary Projects\C328V_Camera\bin\Debug\be\FEZ Panda Application.pdb
+C:\Users\Matt\AppData\Local\Temporary Projects\C328V_Camera\bin\Debug\FEZ Panda Application.exe
+C:\Users\Matt\AppData\Local\Temporary Projects\C328V_Camera\bin\Debug\FEZ Panda Application.pdb
+C:\Users\Matt\AppData\Local\Temporary Projects\C328V_Camera\bin\Debug\le\FEZ Panda Application.pe
+C:\Users\Matt\AppData\Local\Temporary Projects\C328V_Camera\bin\Debug\le\FEZ Panda Application.pdbx
+C:\Users\Matt\AppData\Local\Temporary Projects\C328V_Camera\bin\Debug\be\FEZ Panda Application.pe
+C:\Users\Matt\AppData\Local\Temporary Projects\C328V_Camera\bin\Debug\be\FEZ Panda Application.pdbx
+C:\Users\Matt\AppData\Local\Temporary Projects\C328V_Camera\obj\Debug\ResolveAssemblyReference.cache
+C:\Users\Matt\AppData\Local\Temporary Projects\C328V_Camera\obj\Debug\TinyCLR_DebugReferences.cache
+C:\Users\Matt\AppData\Local\Temporary Projects\C328V_Camera\obj\Debug\C328V_Camera.Resources.resources
+C:\Users\Matt\AppData\Local\Temporary Projects\C328V_Camera\obj\Debug\GenerateResource.read.1.tlog
+C:\Users\Matt\AppData\Local\Temporary Projects\C328V_Camera\obj\Debug\GenerateResource.write.1.tlog
+C:\Users\Matt\AppData\Local\Temporary Projects\C328V_Camera\obj\Debug\C328V_Camera.Resources.tinyresources
+C:\Users\Matt\AppData\Local\Temporary Projects\C328V_Camera\obj\Debug\TinyResGen.cache
+C:\Users\Matt\AppData\Local\Temporary Projects\C328V_Camera\obj\Debug\be\FEZ Panda Application.pe
+C:\Users\Matt\AppData\Local\Temporary Projects\C328V_Camera\obj\Debug\be\FEZ Panda Application.pdbx
+C:\Users\Matt\AppData\Local\Temporary Projects\C328V_Camera\obj\Debug\le\FEZ Panda Application.pe
+C:\Users\Matt\AppData\Local\Temporary Projects\C328V_Camera\obj\Debug\le\FEZ Panda Application.pdbx
+C:\Users\Matt\AppData\Local\Temporary Projects\C328V_Camera\obj\Debug\FEZ Panda Application.exe
+C:\Users\Matt\AppData\Local\Temporary Projects\C328V_Camera\obj\Debug\FEZ Panda Application.pdb
+C:\src\Interrogator\C328V_Camera\C328V_Camera\bin\Debug\le\C328V_Camera.exe
+C:\src\Interrogator\C328V_Camera\C328V_Camera\bin\Debug\be\C328V_Camera.exe
+C:\src\Interrogator\C328V_Camera\C328V_Camera\bin\Debug\le\C328V_Camera.pdb
+C:\src\Interrogator\C328V_Camera\C328V_Camera\bin\Debug\be\C328V_Camera.pdb
+C:\src\Interrogator\C328V_Camera\C328V_Camera\bin\Debug\C328V_Camera.exe
+C:\src\Interrogator\C328V_Camera\C328V_Camera\bin\Debug\C328V_Camera.pdb
+C:\src\Interrogator\C328V_Camera\C328V_Camera\bin\Debug\le\C328V_Camera.pe
+C:\src\Interrogator\C328V_Camera\C328V_Camera\bin\Debug\le\C328V_Camera.pdbx
+C:\src\Interrogator\C328V_Camera\C328V_Camera\bin\Debug\be\C328V_Camera.pe
+C:\src\Interrogator\C328V_Camera\C328V_Camera\bin\Debug\be\C328V_Camera.pdbx
+C:\src\Interrogator\C328V_Camera\C328V_Camera\obj\Debug\ResolveAssemblyReference.cache
+C:\src\Interrogator\C328V_Camera\C328V_Camera\obj\Debug\TinyCLR_DebugReferences.cache
+C:\src\Interrogator\C328V_Camera\C328V_Camera\obj\Debug\C328V_Camera.Resources.resources
+C:\src\Interrogator\C328V_Camera\C328V_Camera\obj\Debug\GenerateResource.read.1.tlog
+C:\src\Interrogator\C328V_Camera\C328V_Camera\obj\Debug\GenerateResource.write.1.tlog
+C:\src\Interrogator\C328V_Camera\C328V_Camera\obj\Debug\C328V_Camera.Resources.tinyresources
+C:\src\Interrogator\C328V_Camera\C328V_Camera\obj\Debug\TinyResGen.cache
+C:\src\Interrogator\C328V_Camera\C328V_Camera\obj\Debug\C328V_Camera.exe
+C:\src\Interrogator\C328V_Camera\C328V_Camera\obj\Debug\C328V_Camera.pdb
+C:\src\Interrogator\C328V_Camera\C328V_Camera\obj\Debug\be\C328V_Camera.pe
+C:\src\Interrogator\C328V_Camera\C328V_Camera\obj\Debug\be\C328V_Camera.pdbx
+C:\src\Interrogator\C328V_Camera\C328V_Camera\obj\Debug\le\C328V_Camera.pe
+C:\src\Interrogator\C328V_Camera\C328V_Camera\obj\Debug\le\C328V_Camera.pdbx
