@@ -30,7 +30,11 @@
   </PropertyGroup>
   <Import Project="$(NetMfTargetsBaseDir)$(TargetFrameworkVersion)\CSharp.Targets" />
   <ItemGroup>
+    <Compile Include="AboutMenu.cs" />
+    <Compile Include="MainMenu.cs" />
     <Compile Include="Menu.cs" />
+    <Compile Include="NetworkMenu.cs" />
+    <Compile Include="NetworkMonitor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Resources.Designer.cs">
@@ -38,6 +42,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="SettingsMenu.cs" />
     <Compile Include="uOLED.cs" />
     <Compile Include="ZigBit.cs" />
   </ItemGroup>
@@ -59,5 +64,8 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Menus\" />
   </ItemGroup>
 </Project>

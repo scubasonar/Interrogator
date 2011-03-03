@@ -22,7 +22,8 @@ namespace PandaInterrogator
         static OutputPort led;
         static bool ledState;
         static bool connected;
-        
+        static ZigBit radio;
+
         static DateTime lastAction;
         static Menu mainMenu;
         static Menu aboutMenu; 
@@ -60,19 +61,19 @@ namespace PandaInterrogator
             display.UpdateDeviceInfo(true);
 
             Thread.Sleep(500);
-            ZigBit radio = new ZigBit("COM2");
+            radio = new ZigBit("COM2");
             Random r = new Random();
             radio.dataRX += new EventHandler(radio_dataRX);
             display.Cls();
             lastAction = DateTime.Now;
 
-            
-            mainMenu = new Menu(new string[] { "Start Network", "About", "Shutdown" }, display);
+
+            mainMenu = new MainMenu(display, radio);
             currentMenu = mainMenu;
-            aboutMenu = new Menu(new string[] { "Hello", "test!" }, display);
-            mainMenu.subMenus = new Menu[] {new Menu(new string[] {"test1, test2"}, display), aboutMenu, new Menu(new string[] {"test3", "test4"}, display)};
-            mainMenu.subMenus[1] = aboutMenu;
-            mainMenu.draw();
+            //aboutMenu = new Menu(new string[] { "Hello", "test!" }, display, mainMenu);
+            //mainMenu.subMenus = new Menu[] {new Menu(new string[] {"test1", "test2"}, display, mainMenu), aboutMenu, new Menu(new string[] {"test3", "test4"}, display, mainMenu)};
+            //mainMenu.subMenus[1] = aboutMenu;
+            mainMenu.Draw();
             while (true)
             {
                 
@@ -178,7 +179,7 @@ namespace PandaInterrogator
 
             led.Write(ledState = !ledState);
             */
-            currentMenu.selectionChanged((byte)(mainMenu.selected + 1));
+            currentMenu.SelectionChanged((byte)(currentMenu.selected + 1));
 
             lastAction = DateTime.Now;
             return;
@@ -219,10 +220,19 @@ namespace PandaInterrogator
 
         static void sw1_OnInterrupt(uint data1, uint data2, DateTime time)
         {
-            currentMenu.clear();
-            
-            currentMenu = currentMenu.subMenus[selectedButton];
-            currentMenu.draw();
+            currentMenu.Clear();
+            //currentMenu.selected = selectedButton = 0;
+            try
+            {
+                currentMenu = currentMenu.subMenus[currentMenu.selected];
+            }
+            catch
+            {
+                currentMenu = currentMenu.parent;
+            }
+
+            currentMenu.selected = selectedButton = 0;
+            currentMenu.Draw();
             //throw new NotImplementedException();
         }
 
