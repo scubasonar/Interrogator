@@ -76,38 +76,9 @@ namespace PandaInterrogator
             mainMenu.Draw();
             while (true)
             {
-                
-                /*connected = radio.CheckStatus();
-                if (connected)
-                {
-                    while (connected)
-                    {
-                        display.Cls();
-                        display.DrawRectangle((byte)(display.dInfo.hRes), 0, (byte)(display.dInfo.hRes - 10), 10, new byte[] { 0x07, 0xE0 });
-                        
-                        display.DrawString(0, 0, 2, new byte[] { 0xFF, 0xFF }, "Nodes: " + radio.children.Count.ToString());
-                        if (radio.children.Count > 0)
-                        {
-
-                            display.DrawString(0, 2, 0, new byte[] { 0xFF, 0xFF }, "---------------------");
-                            display.DrawString(0, 3, 0, new byte[] { 0xFF, 0xFF }, "--Connected devices--");
-                            display.DrawString(0, 4, 0, new byte[] { 0xFF, 0xFF }, "---------------------");
-                            for(int i = 0; i < radio.children.Count; i++)
-                                display.DrawString(0, (byte)(i+5), 0, new byte[] { 0xFF, 0xFF },"#"+(i+1)+": "+ radio.children[i].ToString() );
-
-                            radio.Write((ulong)radio.children[0], "test1234", false);
-                        }
-
-                        Thread.Sleep(500);
-                        connected = radio.CheckStatus();
-                    }
-                }
-                else
-                {
-                    radio.Join();
-                    display.DrawRectangle((byte)(display.dInfo.hRes), 0, (byte)(display.dInfo.hRes - 10), 10, new byte[] { 0xF8, 0x00 });
-                }
-            }*/
+                if (currentMenu.title == "Network Monitor")
+                    ((NetworkMenu)currentMenu).Update();
+             
 
                 Thread.Sleep(200);
             }
@@ -221,6 +192,7 @@ namespace PandaInterrogator
         static void sw1_OnInterrupt(uint data1, uint data2, DateTime time)
         {
             currentMenu.Clear();
+            currentMenu.active = false;
             //currentMenu.selected = selectedButton = 0;
             try
             {
@@ -231,6 +203,7 @@ namespace PandaInterrogator
                 currentMenu = currentMenu.parent;
             }
 
+            currentMenu.active = true;
             currentMenu.selected = selectedButton = 0;
             currentMenu.Draw();
             //throw new NotImplementedException();

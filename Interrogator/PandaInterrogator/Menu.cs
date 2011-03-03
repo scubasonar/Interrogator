@@ -19,6 +19,7 @@ namespace PandaInterrogator
         public uOLED disp;
         public ZigBit radio;
 
+        public Boolean active = false; // is this menu active?
         public Menu()
         {
         }
@@ -61,7 +62,7 @@ namespace PandaInterrogator
                 disp.DrawString(0, (byte)(i + 5), 2, new byte[] { uOLED.BLACK.msb, uOLED.BLACK.lsb }, buttons[i]);
         }
 
-        public void SelectionChanged(byte s)
+        public virtual void SelectionChanged(byte s)
         {
             if ((s == selected) || (buttons == null))
                 return;
