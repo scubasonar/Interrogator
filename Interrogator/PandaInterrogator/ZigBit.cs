@@ -282,8 +282,12 @@ namespace DSS.Devices
             radio.DiscardInBuffer();
             radio.DiscardOutBuffer();
 
+            Thread.Sleep(50);
             radio.Write(UTF8Encoding.UTF8.GetBytes(cmd), 0, cmd.Length);
-            return Ack();
+            if (ack)
+                return Ack();
+            else
+                return true;
         }
 
         void ParseCmd()

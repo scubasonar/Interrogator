@@ -11,10 +11,14 @@ namespace PandaInterrogator
             title = "Settings";
             disp = parent.disp;
             radio = Parent.radio;
+            sw1 = parent.sw1;
+            sw2 = parent.sw2;
+
         }
 
         public override void Draw()
         {
+            disp.Cls();
             disp.DrawString(0, 0, 2, new byte[] { textColor.msb, textColor.lsb }, title);
             disp.DrawString(0, 2, 2, new byte[] { textColor.msb, textColor.lsb }, "Radio");
             disp.DrawString(0, 3, 2, new byte[] { textColor.msb, textColor.lsb }, "PAN: " + radio.config.panID);
