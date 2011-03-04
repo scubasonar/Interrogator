@@ -52,7 +52,7 @@ namespace PandaInterrogator
             sw1.EnableInterrupt();
             sw2.OnInterrupt += sw2_OnInterrupt;
             sw2.EnableInterrupt();
-            Cpu.GlitchFilterTime = new TimeSpan(0, 0, 0, 0, 200);
+            Cpu.GlitchFilterTime = new TimeSpan(0, 0, 0, 0, 300);
             
             led = new OutputPort((Cpu.Pin)FEZ_Pin.Digital.LED, ledState);
             //display = new uOLED(new SerialPort("COM1", 9600));
@@ -76,8 +76,8 @@ namespace PandaInterrogator
             mainMenu.Draw();
             while (true)
             {
-                if (currentMenu.title == "Network Monitor")
-                    ((NetworkMenu)currentMenu).Update();
+                //if (currentMenu.title == "Network Monitor")
+                   // ((NetworkMenu)currentMenu).Update();
              
 
                 Thread.Sleep(200);

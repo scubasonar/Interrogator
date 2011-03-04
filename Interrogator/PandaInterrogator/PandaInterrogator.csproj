@@ -30,11 +30,11 @@
   </PropertyGroup>
   <Import Project="$(NetMfTargetsBaseDir)$(TargetFrameworkVersion)\CSharp.Targets" />
   <ItemGroup>
-    <Compile Include="AboutMenu.cs" />
-    <Compile Include="MainMenu.cs" />
-    <Compile Include="Menu.cs" />
-    <Compile Include="NetworkMenu.cs" />
-    <Compile Include="NetworkMonitor.cs" />
+    <Compile Include="Menus\AboutMenu.cs" />
+    <Compile Include="Menus\MainMenu.cs" />
+    <Compile Include="Menus\Menu.cs" />
+    <Compile Include="Menus\NetworkMenu.cs" />
+    <Compile Include="Menus\NodeMenu.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Resources.Designer.cs">
@@ -65,7 +65,5 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Menus\" />
-  </ItemGroup>
+  <ItemGroup />
 </Project>
