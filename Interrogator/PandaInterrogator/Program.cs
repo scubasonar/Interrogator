@@ -73,6 +73,8 @@ namespace PandaInterrogator
             mainMenu.active = true;
             while (true)
             {
+                if (DateTime.Now > lastAction.AddSeconds(10)) 
+                    screenSaver();
                 Thread.Sleep(200);
             }
         }
@@ -96,7 +98,7 @@ namespace PandaInterrogator
 
         static void screenSaver()
         {
-            Random r = new Random();
+            /*Random r = new Random();
             display.Cls();
             display.DrawString(0, 0, 0, new byte[] { 0xFF, 0xFF }, "Going to sleep");
             Thread.Sleep(250);
@@ -106,7 +108,7 @@ namespace PandaInterrogator
                 Thread.Sleep(250);
             }
 
-            display.Cls();
+            display.Cls();*/
             display.ShutDown(true);
 
             led.Write(ledState = false);
@@ -116,7 +118,7 @@ namespace PandaInterrogator
             Thread.Sleep(100);
             bool success = display.ShutDown(false);
             Thread.Sleep(500);
-            display.DrawString(0, 0, 0, new byte[] { 0xFF, 0xFF }, "Waking up.");
+            /*display.DrawString(0, 0, 0, new byte[] { 0xFF, 0xFF }, "Waking up.");
             for (byte i = 0; i < 4; i++)
             {
                 display.DrawString((byte)(10 + i), 0, 0, new byte[] { 0xFF, 0xFF }, ".");
@@ -124,7 +126,7 @@ namespace PandaInterrogator
             }
 
             display.Cls();
-            currentMenu.Draw();
+            currentMenu.Draw();*/
         }
 
     }
