@@ -26,7 +26,6 @@ namespace PandaInterrogator
         public override void Clear()
         {
             disp.Cls();
-            disp.DrawString(0, 0, 2, new byte[] { 0x00, 0x00 }, "Network Monitor");
         }
 
         public override void SelectionChanged(byte s)

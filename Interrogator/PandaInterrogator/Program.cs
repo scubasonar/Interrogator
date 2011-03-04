@@ -191,8 +191,10 @@ namespace PandaInterrogator
 
         static void sw1_OnInterrupt(uint data1, uint data2, DateTime time)
         {
-            currentMenu.Clear();
             currentMenu.active = false;
+            Thread.Sleep(200);
+            currentMenu.Clear();
+            
             //currentMenu.selected = selectedButton = 0;
             try
             {
