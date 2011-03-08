@@ -37,7 +37,6 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="uOLED.cs" />
     <Compile Include="ZigBit.cs" />
   </ItemGroup>
   <ItemGroup>

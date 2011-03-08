@@ -16,7 +16,6 @@ namespace EndDevice
     {
         const byte btnHeight = 18;
         static byte selectedButton = 0;
-        static uOLED display;
         static InputPort sw1;
         static InterruptPort sw2;
         static OutputPort led;
@@ -82,24 +81,7 @@ namespace EndDevice
                 {
                     while (connected)
                     {
-                        /*display.Cls();
-                        display.DrawRectangle((byte)(display.dInfo.hRes), 0, (byte)(display.dInfo.hRes - 10), 10, new byte[] { 0x07, 0xE0 });
-                        
-                        display.DrawString(0, 0, 2, new byte[] { 0xFF, 0xFF }, "Nodes: " + radio.children.Count.ToString());
-                        if (radio.children.Count > 0)
-                        {
-
-                            display.DrawString(0, 2, 0, new byte[] { 0xFF, 0xFF }, "---------------------");
-                            display.DrawString(0, 3, 0, new byte[] { 0xFF, 0xFF }, "--Connected devices--");
-                            display.DrawString(0, 4, 0, new byte[] { 0xFF, 0xFF }, "---------------------");
-                            for(int i = 0; i < radio.children.Count; i++)
-                                display.DrawString(0, (byte)(i+5), 0, new byte[] { 0xFF, 0xFF },"#"+(i+1)+": "+ radio.children[i].ToString() );
-
-                            radio.Write((ulong)radio.children[0], "test1234", false);
-                        }
-
-                        Thread.Sleep(500);*/
-                        connected = radio.CheckStatus();
+                      
                     }
                 }
                 else
@@ -116,110 +98,6 @@ namespace EndDevice
             //display.DrawString(0, 5, 0, new byte[] { 0xFF, 0xFF }, "RX: " + args.source + "," + args.data);
             Thread.Sleep(1000);
         }
-
-        static void radio_dataRX(object sender, ZigBitDataRXEventArgs e)
-        {
-            //display.DrawString(0,5,0, new byte[] {0xFF, 0xFF}, "RX: " + e.source + "," + e.data);
-            Thread.Sleep(1000);
-        }
-
-        static void radio_DataReceived(object sender, SerialDataReceivedEventArgs e)
-        {
-            SerialPort radio = (SerialPort)sender;
-            byte[] rx = new byte[radio.BytesToRead];
-            string rxs;
-
-            radio.Read(rx, 0, rx.Length);
-            rxs = new string(UTF8Encoding.UTF8.GetChars(rx));
-            Debug.Print(rxs);
-        }
-
-        static void screenSaver()
-        {
-            Random r = new Random();
-            display.Cls();
-            display.DrawString(0, 0, 0, new byte[] { 0xFF, 0xFF }, "Going to sleep");
-            Thread.Sleep(250);
-            for (byte i = 0; i < 4; i++)
-            {
-                display.DrawString((byte)(14+i), 0, 0, new byte[] { 0xFF, 0xFF }, ".");
-                Thread.Sleep(250);
-            }
-
-            display.Cls();
-            display.ShutDown(true);
-            
-            led.Write(ledState = false);
-            Thread.Sleep(100);
-            Power.Hibernate(Power.WakeUpInterrupt.InterruptInputs);
-            //while(DateTime.Now > lastAction.AddSeconds(1));
-            Thread.Sleep(100);
-            bool success = display.ShutDown(false);
-            //Thread.Sleep(500);
-            display.DrawString(0, 0, 0, new byte[] { 0xFF, 0xFF }, "Waking up.");
-            for (byte i = 0; i < 4; i++)
-            {
-                display.DrawString((byte)(10 + i), 0, 0, new byte[] { 0xFF, 0xFF }, ".");
-                Thread.Sleep(250);
-            }
-
-            drawButtons();
-        }
-
-        static void sw2_OnInterrupt(uint data1, uint data2, DateTime time)
-        {
-            
-            byte last = selectedButton;
-            selectedButton++;
-            if (selectedButton > 8) selectedButton = 0;
-            updateButtons(last, selectedButton);
-
-            led.Write(ledState = !ledState);
-
-            lastAction = DateTime.Now;
-            return;
-        }
-
-        public static void drawButtons()
-        {
-            selectedButton = 0;
-            display.Cls();
-            display.DrawButtonTXT(0x00, 0, 0, new byte[] { 0xFF, 0xFF }, 0x00, new byte[] { 0xBB, 0x00 }, 1, 1, "Button # 0" );
-            for (int i = 1; i < 9; i++)
-            {
-                display.DrawButtonTXT(0x01, 0, (byte)(btnHeight * i), new byte[] { 0x0F, 0xBF }, 0x00, new byte[] { 0xAA, 0x00 }, 1, 1, "Button # " + i);
-            }
-
-        }
-
-        public static void updateButtons(byte last, byte current)
-        {
-            if (current == last) return;
-            display.DrawButtonTXT(0x01, 0, (byte)(btnHeight * last), new byte[] { 0x0F, 0xBF }, 0x00, new byte[] { 0xAA, 0x00 }, 1, 1, "Button # " + last);
-            display.DrawButtonTXT(0x00, 0, (byte)(btnHeight * current), new byte[] { 0xFF, 0xFF }, 0x00, new byte[] { 0xBB, 0x00 }, 1, 1, "Button # " + current);
-            /*for (byte i = 0; i < 9; i++)
-            {
-                if(i == selectedButton)
-                    display.DrawButtonTXT(0x01, 0, (byte)(btnHeight * i), new byte[] { 0xFF, 0xFF }, 0x00, new byte[] { 0xBB, 0x00 }, 1, 1, "Button # " + i);
-                else
-                    display.DrawButtonTXT(0x00, 0, (byte)(btnHeight * i), new byte[] { 0x0F, 0xBF }, 0x00, new byte[] { 0xAA, 0x00 }, 1, 1, "Button # " + i);
-
-                
-            }*/
-         
-        }
-
-        static void sw1_OnInterrupt(Cpu.Pin port, bool state, TimeSpan time)
-        {
-        }
-
-        static void sw1_OnInterrupt(uint data1, uint data2, DateTime time)
-        {
-            
-            throw new NotImplementedException();
-        }
-
-       
 
     }
 }
