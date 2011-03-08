@@ -112,6 +112,13 @@ namespace DSS.Devices
             if (dataRX != null) dataRX(this, e);
         }
 
+        public event EventHandler childrenChanged;
+
+        protected virtual void On_childrenChanged(EventArgs e)
+        {
+            if (childrenChanged != null) childrenChanged(this, e);
+        }
+
         #endregion
 
         const int INITRETRIES = 3;
@@ -239,6 +246,7 @@ namespace DSS.Devices
             if (radio.IsOpen)
             {
                 radio.DataReceived += new SerialDataReceivedEventHandler(radio_DataReceived);
+                
             }
             return radio.IsOpen;
         }
@@ -274,8 +282,12 @@ namespace DSS.Devices
             radio.DiscardInBuffer();
             radio.DiscardOutBuffer();
 
+            Thread.Sleep(50);
             radio.Write(UTF8Encoding.UTF8.GetBytes(cmd), 0, cmd.Length);
-            return Ack();
+            if (ack)
+                return Ack();
+            else
+                return true;
         }
 
         void ParseCmd()
@@ -409,6 +421,22 @@ namespace DSS.Devices
                             return;
                         else
                             children.Add(ID);
+                        On_childrenChanged(new EventArgs());
+                        break;
+                    }
+                    catch
+                    {
+                        break;
+                    }
+                case "CHILD_LOST":
+                    try
+                    {
+                        ulong ID = ulong.Parse(args[2]);
+                        if (!children.Contains(ID))
+                            return;
+                        else
+                            children.Remove(ID);
+                            On_childrenChanged(new EventArgs());
                         break;
                     }
                     catch
