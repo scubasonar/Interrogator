@@ -6,7 +6,7 @@ using Microsoft.SPOT.Hardware;
 
 using GHIElectronics.NETMF.FEZ;
 
-namespace GardenLight
+namespace DSS.Devices
 {
     class BlinkM
     {
