@@ -73,7 +73,7 @@ namespace PandaInterrogator
             mainMenu.active = true;
             while (true)
             {
-                if (DateTime.Now > lastAction.AddSeconds(10)) 
+                if (DateTime.Now > lastAction.AddMinutes(3)) 
                     screenSaver();
                 Thread.Sleep(200);
             }
