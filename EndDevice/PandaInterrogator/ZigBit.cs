@@ -478,7 +478,7 @@ namespace DSS.Devices
             string cmd;
 
             radio.Write(Encoding.UTF8.GetBytes("ATZ\r"), 0, 4);
-            Thread.Sleep(200);
+            Thread.Sleep(400);
             //radio init
             success &= Echo(config.echo);
             success &= SetAddrExt(config.addrExtend);

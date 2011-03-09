@@ -115,6 +115,9 @@ namespace EndDevice
                     light.Red = 0;
                     light.Blue = 0;
                     light.Green = 0;
+                    radio.radio.Close();
+                    radio.radio.Open();
+                    radio.Init();
                     radio.Join();
                     //display.DrawRectangle((byte)(display.dInfo.hRes), 0, (byte)(display.dInfo.hRes - 10), 10, new byte[] { 0xF8, 0x00 });
                 }
