@@ -477,17 +477,20 @@ namespace DSS.Devices
             bool success = true;
             string cmd;
 
-            radio.Write(Encoding.UTF8.GetBytes("ATZ\r"), 0, 4);
+            //radio.Write(Encoding.UTF8.GetBytes("Z\r"), 0, 2);
             Thread.Sleep(400);
             //radio init
             success &= Echo(config.echo);
+            success &= SetAddrExt(config.addrExtend);
+            if (!success)
+                Leave();
             success &= SetAddrExt(config.addrExtend);
             radio.Write(Encoding.UTF8.GetBytes("AT+WCHMASK=100000\r"), 0, 18);
             success &= Ack();
             success &= SetRole(config.role);
             success &= SetAddrShort(config.addrShort);
             success &= Join(config.panID);
-            radio.Write(Encoding.UTF8.GetBytes("ATX\r\n"), 0, 5);
+            radio.Write(Encoding.UTF8.GetBytes("ATX\r"), 0, 4);
             success &= Ack();
             radio.Write(Encoding.UTF8.GetBytes("ATS30=1\r"), 0, 8);
             success &= Ack();
@@ -581,8 +584,16 @@ namespace DSS.Devices
 
             radio.DiscardInBuffer();
             radio.Write(Encoding.UTF8.GetBytes(cmd), 0, cmd.Length);
+            Debug.Print("Trying to join");
+            Thread.Sleep(500);
+            if (Ack())
+            {
+                connected = true;
+                // make sure we're really connected
+            }
 
-            connected = Ack();
+            else
+                Init();
             
             return connected;
         }
@@ -592,6 +603,7 @@ namespace DSS.Devices
             bool success = false;
             if (success = SetPANID(panID))
                 success &= Join();
+
             return success;
         }
 
@@ -608,14 +620,19 @@ namespace DSS.Devices
 
         public bool Ack()
         {
+            bool success;
             DateTime start = DateTime.Now;
             while (!GotResponse)
             {
                 if (DateTime.Now > start.AddSeconds(2))
+                {
+                    Debug.Print("Ack Timeout");
                     return false;
+                }
             }
-
-            return GotACK;
+            success = GotACK;
+            Debug.Print("Got Ack: " + success.ToString());
+            return success;
         }
 
     }

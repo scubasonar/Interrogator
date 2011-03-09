@@ -25,7 +25,7 @@ namespace EndDevice
         static bool connected;
         static public byte[] currentcolor = { 0, 0, 0 };
         enum colors {RED = 0, BLUE, GREEN};
-
+        static ZigBit radio;
         static DateTime lastAction;
         public static void Main()
         {
@@ -75,13 +75,12 @@ namespace EndDevice
             radioConfig.retries = 2;
 
 
-            ZigBit radio = new ZigBit(radioConfig);
+            radio = new ZigBit(radioConfig);
             radio.dataRX += new EventHandler(radio_dataRX);
             
             //display.Cls();
             lastAction = DateTime.Now;
 
-            light.Blue = 255 ;
             while (true)
             {
                 if (radio.connected)
@@ -105,6 +104,7 @@ namespace EndDevice
                         Blink();
                         Thread.Sleep(500);
                     }
+                    
                 }
                 else
                 {
@@ -115,9 +115,7 @@ namespace EndDevice
                     light.Red = 0;
                     light.Blue = 0;
                     light.Green = 0;
-                    radio.radio.Close();
-                    radio.radio.Open();
-                    radio.Init();
+                  
                     radio.Join();
                     //display.DrawRectangle((byte)(display.dInfo.hRes), 0, (byte)(display.dInfo.hRes - 10), 10, new byte[] { 0xF8, 0x00 });
                 }
@@ -140,28 +138,33 @@ namespace EndDevice
                         currentcolor[0] = 255;
                         currentcolor[1] = 0;
                         currentcolor[2] = 0;
+                        radio.Write(0, "RT,COLOR," + color, false);
                         break;
                     case "BLUE":
                         currentcolor[0] = 0;
                         currentcolor[1] = 255;
                         currentcolor[2] = 0;
+                        radio.Write(0, "RT,COLOR," + color, false);
                         break;
                     case "GREEN":
                         currentcolor[0] = 0;
                         currentcolor[1] = 0;
                         currentcolor[2] = 255;
+                        radio.Write(0, "RT,COLOR," + color, false);
                         break;
                     case "OFF":
                         currentcolor[0] = 0;
                         currentcolor[1] = 0;
                         currentcolor[2] = 0;
+                        radio.Write(0, "RT,COLOR," + color, false);
                         break;
+                     
                 }
             }
             catch
             { return; }
 
-
+            
             Thread.Sleep(1000);
         }
 
