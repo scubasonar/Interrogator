@@ -587,7 +587,7 @@ namespace DSS.Devices
             DateTime start = DateTime.Now;
             while (!GotResponse)
             {
-                if (DateTime.Now > start.AddSeconds(5))
+                if (DateTime.Now > start.AddSeconds(2))
                     return false;
             }
 

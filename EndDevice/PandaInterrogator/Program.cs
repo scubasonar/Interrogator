@@ -14,14 +14,18 @@ namespace EndDevice
 {
     public class Program
     {
+        static BlinkM light = new BlinkM();
         const byte btnHeight = 18;
         static byte selectedButton = 0;
         static InputPort sw1;
+        static InputPort unusedAnalog;
         static InterruptPort sw2;
         static OutputPort led;
         static bool ledState;
         static bool connected;
-        
+        static public byte[] currentcolor = { 0, 0, 0 };
+        enum colors {RED = 0, BLUE, GREEN};
+
         static DateTime lastAction;
         public static void Main()
         {
@@ -46,6 +50,7 @@ namespace EndDevice
             //sw2.OnInterrupt += sw2_OnInterrupt;
             //sw2.EnableInterrupt();
             Cpu.GlitchFilterTime = new TimeSpan(0, 0, 0, 0, 200);
+            //unusedAnalog = new InputPort((Cpu.Pin)FEZ_Pin.AnalogIn.An0, );
             
             led = new OutputPort((Cpu.Pin)FEZ_Pin.Digital.LED, ledState);
             //display = new uOLED(new SerialPort("COM1", 9600));
@@ -56,8 +61,10 @@ namespace EndDevice
             Thread.Sleep(500);
             ZigBit.Config radioConfig = new ZigBit.Config();
             radioConfig.role = ZigBit.Role.EndDevice;
-            radioConfig.addrExtend = 22;
-            radioConfig.addrShort = 22;
+            Random r = new Random();
+            int ID = r.Next(1000);
+            radioConfig.addrExtend = (ulong)ID;
+            radioConfig.addrShort = ID;
             radioConfig.baud = 38400;
             radioConfig.commPort = "COM1";
             radioConfig.connected = false;
@@ -69,23 +76,49 @@ namespace EndDevice
 
 
             ZigBit radio = new ZigBit(radioConfig);
-            Random r = new Random();
             radio.dataRX += new EventHandler(radio_dataRX);
+            
             //display.Cls();
             lastAction = DateTime.Now;
-            
+
+            light.Blue = 255 ;
             while (true)
             {
                 connected = radio.CheckStatus();
                 if (connected)
                 {
+                    for (int i = 0; i < 3; i++)
+                    {
+
+                        light.Red = 0;
+                        light.Blue = 0;
+                        light.Green = 255;
+                        Thread.Sleep(100);
+                        light.Red = 0;
+                        light.Blue = 0;
+                        light.Green = 0;
+                        Thread.Sleep(500);
+                    }
+
+
                     while (connected)
                     {
-                      
+                        Blink();
+                        connected = radio.CheckStatus();
+                        Thread.Sleep(500);
                     }
                 }
                 else
                 {
+                   
+                    radio.Leave();
+                    light.Red = 255;
+                    light.Blue = 0;
+                    light.Green = 0;
+                    Thread.Sleep(500);
+                    light.Red = 0;
+                    light.Blue = 0;
+                    light.Green = 0;
                     radio.Join();
                     //display.DrawRectangle((byte)(display.dInfo.hRes), 0, (byte)(display.dInfo.hRes - 10), 10, new byte[] { 0xF8, 0x00 });
                 }
@@ -96,7 +129,56 @@ namespace EndDevice
         {
             ZigBitDataRXEventArgs args = (ZigBitDataRXEventArgs)e;
             //display.DrawString(0, 5, 0, new byte[] { 0xFF, 0xFF }, "RX: " + args.source + "," + args.data);
+
+            try
+            {
+                string[] data = args.data.Split(new char[] { ',' });
+                string color = data[2];
+
+                switch (color)
+                {
+                    case "RED":
+                        currentcolor[0] = 255;
+                        currentcolor[1] = 0;
+                        currentcolor[2] = 0;
+                        break;
+                    case "BLUE":
+                        currentcolor[0] = 0;
+                        currentcolor[1] = 255;
+                        currentcolor[2] = 0;
+                        break;
+                    case "GREEN":
+                        currentcolor[0] = 0;
+                        currentcolor[1] = 0;
+                        currentcolor[2] = 255;
+                        break;
+                }
+            }
+            catch
+            { return; }
+
+
             Thread.Sleep(1000);
+        }
+
+        static void SetColor()
+        {
+            light.Red = currentcolor[0];
+            light.Blue = currentcolor[1];
+            light.Green = currentcolor[2];
+        }
+
+
+        static void Blink()
+        {
+            light.Red = currentcolor[0];
+            light.Blue = currentcolor[1];
+            light.Green = currentcolor[2];
+            Thread.Sleep(100);
+            light.Red = 0;
+            light.Blue = 0;
+            light.Green = 0;
+            Thread.Sleep(300);
         }
 
     }
