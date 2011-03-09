@@ -25,6 +25,7 @@ namespace DSS.Devices
     public class ZigBit
     {
         public ArrayList children;
+        public bool connected;
 
 #region ----------------------------------------- COMMANDS  ------------------------------------------------------------------------- 
         //----------------Networking Prameters--------------------
@@ -119,6 +120,13 @@ namespace DSS.Devices
             if (childrenChanged != null) childrenChanged(this, e);
         }
 
+        public event EventHandler connectionLost;
+
+        protected virtual void On_connectionLost(EventArgs e)
+        {
+            if (connectionLost != null) connectionLost(this, e);
+        }
+
         #endregion
 
         const int INITRETRIES = 3;
@@ -182,8 +190,6 @@ namespace DSS.Devices
             public Parity parity;
             public short dataBits;
             
-            public bool connected;
-
             // RADIO SETTINGS
             public bool echo;
             public ulong addrExtend; // extended address
@@ -198,13 +204,13 @@ namespace DSS.Devices
 
         public ZigBit(string portName)
         {
+            connected = false;
             children = new ArrayList();
             config = new Config();
             config.commPort = portName;
             config.baud = 38400;
             config.parity = Parity.None;
             config.dataBits = 8;
-            config.connected = false;
             config.echo = false;
             config.addrExtend = 1;
             config.addrShort = 1;
@@ -225,6 +231,7 @@ namespace DSS.Devices
 
         public ZigBit(Config c)
         {
+            connected = false;
             config = c;
             
             if (Open())
@@ -443,6 +450,12 @@ namespace DSS.Devices
                     {
                         break;
                     }
+                case "LOST": // connection lost
+                    connected = false;
+                    On_connectionLost(new EventArgs());
+
+                    break;
+                    
                 default:
                     break;
 
@@ -452,7 +465,7 @@ namespace DSS.Devices
 
         public bool Init()
         {
-            config.connected = false;
+            connected = false;
             bool success = true;
             string cmd;
 
@@ -554,13 +567,13 @@ namespace DSS.Devices
         public bool Join()
         {
             string cmd = "AT" + CMD_JOIN + "\r";
-            if(config.connected) Leave();
+            if(connected) Leave();
 
             radio.DiscardInBuffer();
             radio.Write(Encoding.UTF8.GetBytes(cmd), 0, cmd.Length);
 
-            config.connected = Ack();
-            return config.connected;
+            connected = Ack();
+            return connected;
         }
 
         public bool Join(ulong panID)
@@ -574,7 +587,7 @@ namespace DSS.Devices
         // Leave a network
         public bool Leave()
         {
-            config.connected = false;
+            connected = false;
 
             radio.DiscardInBuffer();
             radio.Write(Encoding.UTF8.GetBytes("AT+WLEAVE\r"), 0, 10);

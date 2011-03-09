@@ -67,7 +67,7 @@ namespace EndDevice
             radioConfig.addrShort = ID;
             radioConfig.baud = 38400;
             radioConfig.commPort = "COM1";
-            radioConfig.connected = false;
+            connected = false;
             radioConfig.dataBits = 8;
             radioConfig.echo = false;
             radioConfig.panID = 1620;
