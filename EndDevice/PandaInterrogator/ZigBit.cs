@@ -124,7 +124,15 @@ namespace DSS.Devices
 
         protected virtual void On_connectionLost(EventArgs e)
         {
+            connected = false;
             if (connectionLost != null) connectionLost(this, e);
+        }
+
+        public event EventHandler connectionMade;
+        protected virtual void On_connectionMade(EventArgs e)
+        {
+            connected = true;
+            if (connectionMade != null) connectionMade(this, e);
         }
 
         #endregion
@@ -469,6 +477,8 @@ namespace DSS.Devices
             bool success = true;
             string cmd;
 
+            radio.Write(Encoding.UTF8.GetBytes("ATZ\r"), 0, 4);
+            Thread.Sleep(200);
             //radio init
             success &= Echo(config.echo);
             success &= SetAddrExt(config.addrExtend);
@@ -573,6 +583,7 @@ namespace DSS.Devices
             radio.Write(Encoding.UTF8.GetBytes(cmd), 0, cmd.Length);
 
             connected = Ack();
+            
             return connected;
         }
 

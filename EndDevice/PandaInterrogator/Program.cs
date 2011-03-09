@@ -84,8 +84,7 @@ namespace EndDevice
             light.Blue = 255 ;
             while (true)
             {
-                connected = radio.CheckStatus();
-                if (connected)
+                if (radio.connected)
                 {
                     for (int i = 0; i < 3; i++)
                     {
@@ -101,17 +100,14 @@ namespace EndDevice
                     }
 
 
-                    while (connected)
+                    while (radio.connected)
                     {
                         Blink();
-                        connected = radio.CheckStatus();
                         Thread.Sleep(500);
                     }
                 }
                 else
                 {
-                   
-                    radio.Leave();
                     light.Red = 255;
                     light.Blue = 0;
                     light.Green = 0;
@@ -151,6 +147,11 @@ namespace EndDevice
                         currentcolor[0] = 0;
                         currentcolor[1] = 0;
                         currentcolor[2] = 255;
+                        break;
+                    case "OFF":
+                        currentcolor[0] = 0;
+                        currentcolor[1] = 0;
+                        currentcolor[2] = 0;
                         break;
                 }
             }
