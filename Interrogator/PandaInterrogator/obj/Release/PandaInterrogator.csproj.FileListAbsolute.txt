@@ -97,8 +97,8 @@ C:\src\Interrogator\Interrogator\PandaInterrogator\bin\Release\GHIElectronics.NE
 C:\src\Interrogator\Interrogator\PandaInterrogator\bin\Release\GHIElectronics.NETMF.IO.xml
 C:\src\Interrogator\Interrogator\PandaInterrogator\bin\Release\GHIElectronics.NETMF.SQLite.xml
 C:\src\Interrogator\Interrogator\PandaInterrogator\bin\Release\GHIElectronics.NETMF.System.xml
+C:\src\Interrogator\Interrogator\PandaInterrogator\obj\Release\PandaInterrogator.exe
 C:\src\Interrogator\Interrogator\PandaInterrogator\obj\Release\be\PandaInterrogator.pe
 C:\src\Interrogator\Interrogator\PandaInterrogator\obj\Release\be\PandaInterrogator.pdbx
 C:\src\Interrogator\Interrogator\PandaInterrogator\obj\Release\le\PandaInterrogator.pe
 C:\src\Interrogator\Interrogator\PandaInterrogator\obj\Release\le\PandaInterrogator.pdbx
-C:\src\Interrogator\Interrogator\PandaInterrogator\obj\Release\PandaInterrogator.exe
