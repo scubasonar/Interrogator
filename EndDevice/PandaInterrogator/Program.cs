@@ -21,6 +21,8 @@ namespace EndDevice
         static InputPort unusedAnalog;
         static InterruptPort sw2;
         static OutputPort led;
+        static OutputPort radioPower;
+
         static bool ledState;
         static bool connected;
         static public byte[] currentcolor = { 0, 0, 0 };
@@ -53,6 +55,8 @@ namespace EndDevice
             //unusedAnalog = new InputPort((Cpu.Pin)FEZ_Pin.AnalogIn.An0, );
             
             led = new OutputPort((Cpu.Pin)FEZ_Pin.Digital.LED, ledState);
+            radioPower = new OutputPort((Cpu.Pin)FEZ_Pin.Digital.Di9, false);
+
             //display = new uOLED(new SerialPort("COM1", 9600));
             //display = new uOLED(d);
             //display.ShutDown(false);
@@ -66,7 +70,7 @@ namespace EndDevice
             radioConfig.addrExtend = (ulong)ID;
             radioConfig.addrShort = ID;
             radioConfig.baud = 38400;
-            radioConfig.commPort = "COM1";
+            radioConfig.commPort = "COM4";
             connected = false;
             radioConfig.dataBits = 8;
             radioConfig.echo = false;

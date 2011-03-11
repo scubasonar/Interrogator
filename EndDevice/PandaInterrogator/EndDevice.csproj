@@ -41,7 +41,7 @@
     <Compile Include="ZigBit.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="FEZPanda_GHIElectronics.NETMF.FEZ, Version=4.1.3.0, Culture=neutral, processorArchitecture=MSIL" />
+    <Reference Include="FEZMini_GHIElectronics.NETMF.FEZ, Version=4.1.3.0, Culture=neutral, processorArchitecture=MSIL" />
     <Reference Include="GHIElectronics.NETMF.Hardware, Version=4.1.3.0, Culture=neutral, processorArchitecture=MSIL" />
     <Reference Include="GHIElectronics.NETMF.IO, Version=4.1.3.0, Culture=neutral, processorArchitecture=MSIL" />
     <Reference Include="GHIElectronics.NETMF.SQLite, Version=4.1.3.0, Culture=neutral, processorArchitecture=MSIL" />

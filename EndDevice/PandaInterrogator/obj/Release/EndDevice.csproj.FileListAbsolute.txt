@@ -45,8 +45,8 @@ C:\src\Interrogator\EndDevice\PandaInterrogator\obj\Release\le\EndDevice.pe
 C:\src\Interrogator\EndDevice\PandaInterrogator\obj\Release\le\EndDevice.pdbx
 C:\src\Interrogator\EndDevice\PandaInterrogator\obj\Release\EndDevice.exe
 C:\src\Interrogator\EndDevice\PandaInterrogator\obj\Release\EndDevice.pdb
-C:\src\Interrogator\EndDevice\PandaInterrogator\bin\Release\LE\FEZPanda_GHIElectronics.NETMF.FEZ.pe
-C:\src\Interrogator\EndDevice\PandaInterrogator\bin\Release\BE\FEZPanda_GHIElectronics.NETMF.FEZ.pe
-C:\src\Interrogator\EndDevice\PandaInterrogator\bin\Release\LE\FEZPanda_GHIElectronics.NETMF.FEZ.pdbx
-C:\src\Interrogator\EndDevice\PandaInterrogator\bin\Release\BE\FEZPanda_GHIElectronics.NETMF.FEZ.pdbx
-C:\src\Interrogator\EndDevice\PandaInterrogator\bin\Release\FEZPanda_GHIElectronics.NETMF.FEZ.dll
+C:\src\Interrogator\EndDevice\PandaInterrogator\bin\Release\LE\FEZMini_GHIElectronics.NETMF.FEZ.pe
+C:\src\Interrogator\EndDevice\PandaInterrogator\bin\Release\BE\FEZMini_GHIElectronics.NETMF.FEZ.pe
+C:\src\Interrogator\EndDevice\PandaInterrogator\bin\Release\LE\FEZMini_GHIElectronics.NETMF.FEZ.pdbx
+C:\src\Interrogator\EndDevice\PandaInterrogator\bin\Release\BE\FEZMini_GHIElectronics.NETMF.FEZ.pdbx
+C:\src\Interrogator\EndDevice\PandaInterrogator\bin\Release\FEZMini_GHIElectronics.NETMF.FEZ.dll
