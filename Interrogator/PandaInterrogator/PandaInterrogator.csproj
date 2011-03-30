@@ -42,7 +42,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="SettingsMenu.cs" />
+    <Compile Include="Menus\SettingsMenu.cs" />
     <Compile Include="uOLED.cs" />
     <Compile Include="ZigBit.cs" />
   </ItemGroup>

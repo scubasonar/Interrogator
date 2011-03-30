@@ -11,9 +11,10 @@ namespace PandaInterrogator
             title = "Settings";
             disp = parent.disp;
             radio = Parent.radio;
-            sw1 = parent.sw1;
-            sw2 = parent.sw2;
-
+            button_up = parent.button_up;
+            button_down = parent.button_down;
+            button_select = parent.button_select;
+            button_back = parent.button_back;
         }
 
         public override void Draw()

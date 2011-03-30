@@ -17,8 +17,11 @@ namespace PandaInterrogator
         const byte btnHeight = 18;
         static byte selectedButton = 0;
         static uOLED display;
-        static InterruptPort sw1;
-        static InterruptPort sw2;
+        static InterruptPort button_up;
+        static InterruptPort button_down;
+        static InterruptPort button_select;
+        static InterruptPort button_back;
+
         static OutputPort led;
         static bool ledState;
         static bool connected;
@@ -42,33 +45,40 @@ namespace PandaInterrogator
 
             ledState = false;
 
-            //sw2 = new InterruptPort((Cpu.Pin)FEZ_Pin.Interrupt.Di3, true, Port.ResistorMode.PullUp, Port.InterruptMode.InterruptEdgeLow);
-            //sw1 = new InputPort((Cpu.Pin)FEZ_Pin.Digital.Di2, true, Port.ResistorMode.PullUp);
-
-            sw1 = new InterruptPort((Cpu.Pin)FEZ_Pin.Interrupt.Di7, true, Port.ResistorMode.PullUp, Port.InterruptMode.InterruptEdgeLow);
-            sw2 = new InterruptPort((Cpu.Pin)FEZ_Pin.Interrupt.Di8, true, Port.ResistorMode.PullUp, Port.InterruptMode.InterruptEdgeLow);
+            // ---- trigger and side button
+            //sw1 = new InterruptPort((Cpu.Pin)FEZ_Pin.Interrupt.Di7, true, Port.ResistorMode.PullUp, Port.InterruptMode.InterruptEdgeLow);
+            //sw2 = new InterruptPort((Cpu.Pin)FEZ_Pin.Interrupt.Di8, true, Port.ResistorMode.PullUp, Port.InterruptMode.InterruptEdgeLow);
             
-            sw1.OnInterrupt += sw1_OnInterrupt;
-            sw1.EnableInterrupt();
-            sw2.OnInterrupt += sw2_OnInterrupt;
-            sw2.EnableInterrupt();
+            // --- toggle switch
+            button_up = new InterruptPort((Cpu.Pin)FEZ_Pin.Interrupt.An1, true, Port.ResistorMode.PullUp, Port.InterruptMode.InterruptEdgeLow);
+            button_down = new InterruptPort((Cpu.Pin)FEZ_Pin.Interrupt.An0, true, Port.ResistorMode.PullUp, Port.InterruptMode.InterruptEdgeLow);
+            button_select = new InterruptPort((Cpu.Pin)FEZ_Pin.Interrupt.Di7, true, Port.ResistorMode.PullUp, Port.InterruptMode.InterruptEdgeLow);
+            button_back = new InterruptPort((Cpu.Pin)FEZ_Pin.Interrupt.Di8, true, Port.ResistorMode.PullUp, Port.InterruptMode.InterruptEdgeLow);
+
+            button_up.OnInterrupt += button_pressed;
+            button_up.EnableInterrupt();
+            button_down.OnInterrupt += button_pressed;
+            button_down.EnableInterrupt();
+            button_select.OnInterrupt += button_pressed;
+            button_back.EnableInterrupt();
+
             Cpu.GlitchFilterTime = new TimeSpan(0, 0, 0, 0, 300);
             
             led = new OutputPort((Cpu.Pin)FEZ_Pin.Digital.LED, ledState);
             //display = new uOLED(new SerialPort("COM1", 9600));
             display = new uOLED(d);
             display.ShutDown(false);
-            display.UpdateDeviceInfo(true);
+            display.UpdateDeviceInfo(false);
 
             Thread.Sleep(500);
             radio = new ZigBit("COM2");
             Random r = new Random();
-            radio.dataRX += new EventHandler(radio_dataRX);
+            //radio.dataRX += new EventHandler(radio_dataRX);
             display.Cls();
             lastAction = DateTime.Now;
 
             
-            mainMenu = new MainMenu(display, radio, sw1, sw2);
+            mainMenu = new MainMenu(display, radio, button_up, button_down, button_select, button_back);
             currentMenu = mainMenu;
             mainMenu.active = true;
             while (true)
@@ -86,14 +96,9 @@ namespace PandaInterrogator
             Thread.Sleep(1000);
         }
 
-        static void sw2_OnInterrupt(uint data1, uint data2, DateTime time)
+        static void button_pressed(uint data1, uint data2, DateTime time)
         {
-            lastAction = DateTime.Now;
-        }
-
-        static void sw1_OnInterrupt(uint data1, uint data2, DateTime time)
-        {
-            lastAction = DateTime.Now;
+               lastAction = DateTime.Now;
         }
 
         static void screenSaver()
