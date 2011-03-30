@@ -85,12 +85,12 @@ namespace PandaInterrogator
             button_up.EnableInterrupt();
             button_down.EnableInterrupt();
             button_select.EnableInterrupt();
-            button_back.DisableInterrupt();
+            button_back.EnableInterrupt();
         }
 
         
 
-        void button_up_OnInterrupt(uint data1, uint data2, DateTime time)
+         public virtual void button_up_OnInterrupt(uint data1, uint data2, DateTime time)
         {
             SelectionChanged((byte)(selected - 1));
         }
@@ -114,7 +114,7 @@ namespace PandaInterrogator
             }
         }
 
-        void button_back_OnInterrupt(uint data1, uint data2, DateTime time)
+         public virtual void button_back_OnInterrupt(uint data1, uint data2, DateTime time)
         {
             try
             {

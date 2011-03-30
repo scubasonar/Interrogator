@@ -62,7 +62,7 @@ namespace PandaInterrogator
             button_select.OnInterrupt += button_pressed;
             button_back.EnableInterrupt();
 
-            Cpu.GlitchFilterTime = new TimeSpan(0, 0, 0, 0, 300);
+            Cpu.GlitchFilterTime = new TimeSpan(0, 0, 0, 0, 150);
             
             led = new OutputPort((Cpu.Pin)FEZ_Pin.Digital.LED, ledState);
             //display = new uOLED(new SerialPort("COM1", 9600));
