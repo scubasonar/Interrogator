@@ -33,7 +33,7 @@ namespace PandaInterrogator.Menus
             }
             else
             {
-                radio.Write((ulong)id, "SET,COLOR," + buttons[selected], false);
+                radio.Write((ulong)id, "SET,COLOR," + buttons[selected] , false);
             }
 
         }
@@ -47,6 +47,7 @@ namespace PandaInterrogator.Menus
         public override void LostView()
         {
             base.LostView();
+
             radio.dataRX -= radio_dataRX;
         }
 

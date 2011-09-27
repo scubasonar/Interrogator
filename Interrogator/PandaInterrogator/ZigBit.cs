@@ -24,7 +24,11 @@ namespace DSS.Devices
     // ZigBit Serial Net
     public class ZigBit
     {
-        public ArrayList children;
+        #region --------------------------- CONSTANTS ------------------------------------------------------------------
+        const byte MAX_TX_CHARS = 84; // maximum number of characters to transmit at any one time
+        #endregion
+
+        public ArrayList neighbors; // known stations in the area
         public bool connected;
 
 #region ----------------------------------------- COMMANDS  ------------------------------------------------------------------------- 
@@ -213,16 +217,16 @@ namespace DSS.Devices
         public ZigBit(string portName)
         {
             connected = false;
-            children = new ArrayList();
+            neighbors = new ArrayList();
             config = new Config();
             config.commPort = portName;
             config.baud = 38400;
             config.parity = Parity.None;
             config.dataBits = 8;
             config.echo = false;
-            config.addrExtend = 1;
-            config.addrShort = 1;
-            config.role = Role.Coordinator;
+            config.addrExtend = 5240;
+            config.addrShort = 5240;
+            config.role = Role.Router;
             config.panID = 1620;
             config.retries = 2;
            
@@ -236,6 +240,7 @@ namespace DSS.Devices
 
             }
         }
+
 
         public ZigBit(Config c)
         {
@@ -308,8 +313,10 @@ namespace DSS.Devices
         void ParseCmd()
         {
             string cmd = new string(UTF8Encoding.UTF8.GetChars(rx));
-            
+            string cmdOut = "";
+
             string[] args;
+
             try
             {
                 cmd = cmd.Substring(0, rxcnt);
@@ -321,30 +328,53 @@ namespace DSS.Devices
 
             Debug.Print(cmd);
             
-            args = cmd.Split(new char[] { ':', ' ' });
-            switch (args[0])
+            args = cmd.Split(new char[] { ':', ' ', '|' });
+            if (args.Length == 16)
             {
-                case "ERROR":
-                    GotResponse = true;
-                    LastCmd = args[0];
-                    GotACK = false;
-                    break;
-                case "OK":
-                    GotResponse = true;
-                    LastCmd = args[0];
-                    GotACK = true;
-                    break;
-                case "EVENT":
-                    ProcessEvent(args);
-                    break;
-                case "DATA":
-                    ProcessData(cmd);
-                    break;
-                case "+WCHILDREN":
-                    ProcessChildren(args);
-                    break;
-                default:
-                    break;
+                try{
+                    int id = int.Parse(args[9]);;
+                    
+                    if(!neighbors.Contains(id) && (id != config.addrShort))
+                    {
+                        cmdOut = "ATR" + (int)id + ",0,+WNB3?\r";
+                        radio.Write(UTF8Encoding.UTF8.GetBytes(cmdOut), 0, cmdOut.Length);
+
+                        neighbors.Add(id);
+                        On_childrenChanged(EventArgs.Empty);
+                    }
+                }
+                catch
+                {
+                }
+                Debug.Print(cmd);
+            }
+
+            else
+            {
+                switch (args[0])
+                {
+                    case "ERROR":
+                        GotResponse = true;
+                        LastCmd = args[0];
+                        GotACK = false;
+                        break;
+                    case "OK":
+                        GotResponse = true;
+                        LastCmd = args[0];
+                        GotACK = true;
+                        break;
+                    case "EVENT":
+                        ProcessEvent(args);
+                        break;
+                    case "DATA":
+                        ProcessData(cmd);
+                        break;
+                    case "+WCHILDREN":
+                        ProcessChildren(args);
+                        break;
+                    default:
+                        break;
+                }
             }
             rxcnt = 0;
             return;
@@ -354,28 +384,28 @@ namespace DSS.Devices
         {
             if (args[1] == "")
             {
-                children.Clear();
+                neighbors.Clear();
                 return;
             }
 
             string[] childs = args[1].Split(new char[] { ',' });
-            ulong[] childIDs = new ulong[childs.Length];
+            int[] childIDs = new int[childs.Length];
 
             for (int i = 0; i < childs.Length; i++)
             {
-                childIDs[i] = ulong.Parse(childs[i]);
-                if (!children.Contains(childIDs[i]))
-                    children.Add(childIDs[i]);
+                childIDs[i] = int.Parse(childs[i]);
+                if (!neighbors.Contains(childIDs[i]))
+                    neighbors.Add(childIDs[i]);
             }
 
-            foreach (object ID in children)
+            foreach (object ID in neighbors)
             {
                 try
                 {
                     bool match = false;
                     for (int i = 0; i < childIDs.Length; i++)
-                        if (childIDs[i] == (ulong)ID) match = true;
-                    if (!match) children.Remove(ID);
+                        if (childIDs[i] == (int)ID) match = true;
+                    if (!match) neighbors.Remove(ID);
                 }
                 catch
                 {
@@ -385,7 +415,7 @@ namespace DSS.Devices
             LastCmd = args[0];
         }
 
-        void UpdateChildren()
+        public void UpdateChildren()
         {
             string cmd;
             DateTime start = DateTime.Now;
@@ -414,6 +444,20 @@ namespace DSS.Devices
             }*/
         }
 
+        public void Scan() // look for nodes and add them to the network table
+        {
+            string cmd;
+            cmd = "AT+WNB3?\r";
+            radio.Write(UTF8Encoding.UTF8.GetBytes(cmd), 0, cmd.Length);
+            Thread.Sleep(500);
+            for (int i = 0; i < neighbors.Count; i++)
+            {
+                cmd = "ATR" + (int)neighbors[i] + ",0,+WNB3?\r";
+                radio.Write(UTF8Encoding.UTF8.GetBytes(cmd), 0, cmd.Length);
+                Thread.Sleep(500);
+            }
+        }
+
         void ProcessData(string raw)
         {
             string[] separate = raw.Split(new char[] { ':' });
@@ -431,11 +475,11 @@ namespace DSS.Devices
                 case "CHILD_JOINED": // check if the child already exists and if not add him to the list
                     try
                     {
-                        ulong ID = ulong.Parse(args[2]);
-                        if (children.Contains(ID))
+                        int ID = int.Parse(args[2]);
+                        if (neighbors.Contains(ID))
                             return;
                         else
-                            children.Add(ID);
+                            neighbors.Add(ID);
                         On_childrenChanged(new EventArgs());
                         break;
                     }
@@ -446,11 +490,11 @@ namespace DSS.Devices
                 case "CHILD_LOST":
                     try
                     {
-                        ulong ID = ulong.Parse(args[2]);
-                        if (!children.Contains(ID))
+                        int ID = int.Parse(args[2]);
+                        if (!neighbors.Contains(ID))
                             return;
                         else
-                            children.Remove(ID);
+                            neighbors.Remove(ID);
                             On_childrenChanged(new EventArgs());
                         break;
                     }
@@ -478,22 +522,33 @@ namespace DSS.Devices
             string cmd;
 
             radio.Write(Encoding.UTF8.GetBytes("ATZ\r"), 0, 4);
-            Thread.Sleep(200);
+            radio.Write(Encoding.UTF8.GetBytes("ATZ\r"), 0, 4);
+            Thread.Sleep(5000);
             //radio init
             success &= Echo(config.echo);
+            Thread.Sleep(200);
             success &= SetAddrExt(config.addrExtend);
+            Thread.Sleep(200);
             radio.Write(Encoding.UTF8.GetBytes("AT+WCHMASK=100000\r"), 0, 18);
+            Thread.Sleep(200);
             success &= Ack();
+            Thread.Sleep(200);
             success &= SetRole(config.role);
+            Thread.Sleep(200);
             success &= SetAddrShort(config.addrShort);
+            Thread.Sleep(200);
             success &= Join(config.panID);
+            Thread.Sleep(200);
             radio.Write(Encoding.UTF8.GetBytes("ATX\r\n"), 0, 5);
             success &= Ack();
+            Thread.Sleep(200);
             radio.Write(Encoding.UTF8.GetBytes("ATS30=1\r"), 0, 8);
             success &= Ack();
+            Thread.Sleep(200);
           /*  cmd = "AT" + CMD_RETRY + " " + config.retries + "\r\n";
             radio.Write(Encoding.UTF8.GetBytes(cmd), 0, cmd.Length);
             success &= Ack();*/
+            
             return success;
 
         }
@@ -581,7 +636,7 @@ namespace DSS.Devices
 
             radio.DiscardInBuffer();
             radio.Write(Encoding.UTF8.GetBytes(cmd), 0, cmd.Length);
-
+            Thread.Sleep(2000);
             connected = Ack();
             
             return connected;
@@ -613,6 +668,8 @@ namespace DSS.Devices
             {
                 if (DateTime.Now > start.AddSeconds(2))
                     return false;
+                else
+                    Thread.Sleep(500);
             }
 
             return GotACK;

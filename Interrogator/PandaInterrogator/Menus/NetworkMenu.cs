@@ -25,12 +25,12 @@ namespace PandaInterrogator
 
         void RadioChildrenChanged(object sender, EventArgs e)
         {
-                subMenus = new NodeMenu[radio.children.Count + 1];
+                subMenus = new NodeMenu[radio.neighbors.Count + 1];
                 for (int i = 0; i < subMenus.Length; i++)
                 {
                     try
                     {
-                        subMenus[i] = new NodeMenu(this, (uint.Parse(radio.children[i].ToString())));
+                        subMenus[i] = new NodeMenu(this, (uint.Parse(radio.neighbors[i].ToString())));
                     }
                     catch
                     {
@@ -56,26 +56,29 @@ namespace PandaInterrogator
             disp.DrawString(0, 0, 2, new byte[] { textColor.msb, textColor.lsb }, "Network Monitor");
             disp.DrawRectangle((byte)(disp.dInfo.hRes), (byte)disp.dInfo.vRes, (byte)(disp.dInfo.hRes - 10), (byte)(disp.dInfo.vRes - 10), new byte[] { 0x07, 0xE0 });
 
-            disp.DrawString(0, 3, 2, new byte[] { 0xFF, 0xFF }, "Nodes: " + radio.children.Count.ToString());
-            if (radio.children.Count > 0)
+            disp.DrawString(0, 3, 2, new byte[] { 0xFF, 0xFF }, "Nodes: " + radio.neighbors.Count.ToString());
+            if (radio.neighbors.Count > 0)
             {
-                if (selected > radio.children.Count) selected = 0;
-                for (int i = 0; i < radio.children.Count; i++)
+                if (selected > radio.neighbors.Count) selected = 0;
+                for (int i = 0; i < radio.neighbors.Count; i++)
                 {
                     if (i == selected)
-                        disp.DrawString(0, (byte)(i + 5), 2, new byte[] { selectedColor.msb, selectedColor.lsb }, "#" + (i + 1) + ": " + radio.children[i].ToString());
-                    else disp.DrawString(0, (byte)(i + 5), 2, new byte[] { 0xFF, 0xFF }, "#" + (i + 1) + ": " + radio.children[i].ToString());
+                        disp.DrawString(0, (byte)(i + 5), 2, new byte[] { selectedColor.msb, selectedColor.lsb }, "#" + (i + 1) + ": " + radio.neighbors[i].ToString());
+                    else disp.DrawString(0, (byte)(i + 5), 2, new byte[] { 0xFF, 0xFF }, "#" + (i + 1) + ": " + radio.neighbors[i].ToString());
                 }
             }
 
-            if(selected == radio.children.Count)
-                disp.DrawString(0, (byte)(radio.children.Count + 5), 2, new byte[] { selectedColor.msb, selectedColor.lsb }, "Back");
+            if(selected == radio.neighbors.Count)
+                disp.DrawString(0, (byte)(radio.neighbors.Count + 5), 2, new byte[] { selectedColor.msb, selectedColor.lsb }, "Back");
             else
-                disp.DrawString(0, (byte)(radio.children.Count + 5), 2, new byte[] { textColor.msb, textColor.lsb }, "Back");
+                disp.DrawString(0, (byte)(radio.neighbors.Count + 5), 2, new byte[] { textColor.msb, textColor.lsb }, "Back");
         }
 
         public override void SelectionChanged(byte s)
         {
+            if (subMenus == null)
+                RadioChildrenChanged(null, null);
+
             selected = s;
             Draw();
             //Update();
@@ -93,18 +96,18 @@ namespace PandaInterrogator
                         disp.DrawRectangle((byte)(disp.dInfo.hRes), (byte)disp.dInfo.vRes, (byte)(disp.dInfo.hRes - 10), (byte)(disp.dInfo.vRes - 10), new byte[] { 0x07, 0xE0 });
 
                         disp.DrawString(0, 2, 2, new byte[] { 0xFF, 0xFF }, "Status: Online");
-                        disp.DrawString(0, 3, 2, new byte[] { 0xFF, 0xFF }, "Nodes: " + radio.children.Count.ToString());
-                        if (radio.children.Count > 0)
+                        disp.DrawString(0, 3, 2, new byte[] { 0xFF, 0xFF }, "Nodes: " + radio.neighbors.Count.ToString());
+                        if (radio.neighbors.Count > 0)
                         {
-                            if (selected > radio.children.Count - 1) selected = 0;
-                            for(int i = 0; i < radio.children.Count; i++)
+                            if (selected > radio.neighbors.Count - 1) selected = 0;
+                            for(int i = 0; i < radio.neighbors.Count; i++)
                             {
                                 if(i== selected)
-                                    disp.DrawString(0, (byte)(i+5), 2, new byte[] { selectedColor.msb, selectedColor.lsb},"#"+(i+1)+": "+ radio.children[i].ToString() );
-                                else disp.DrawString(0, (byte)(i+5), 2, new byte[] { 0xFF, 0xFF },"#"+(i+1)+": "+ radio.children[i].ToString() );
+                                    disp.DrawString(0, (byte)(i+5), 2, new byte[] { selectedColor.msb, selectedColor.lsb},"#"+(i+1)+": "+ radio.neighbors[i].ToString() );
+                                else disp.DrawString(0, (byte)(i+5), 2, new byte[] { 0xFF, 0xFF },"#"+(i+1)+": "+ radio.neighbors[i].ToString() );
                             }
 
-                            radio.Write((ulong)radio.children[0], "test1234", false);
+                            radio.Write((ulong)radio.neighbors[0], "test1234", false);
                         }
 
                         Thread.Sleep(500);

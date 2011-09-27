@@ -45,10 +45,6 @@ namespace PandaInterrogator
 
             ledState = false;
 
-            // ---- trigger and side button
-            //sw1 = new InterruptPort((Cpu.Pin)FEZ_Pin.Interrupt.Di7, true, Port.ResistorMode.PullUp, Port.InterruptMode.InterruptEdgeLow);
-            //sw2 = new InterruptPort((Cpu.Pin)FEZ_Pin.Interrupt.Di8, true, Port.ResistorMode.PullUp, Port.InterruptMode.InterruptEdgeLow);
-            
             // --- toggle switch
             button_up = new InterruptPort((Cpu.Pin)FEZ_Pin.Interrupt.An1, true, Port.ResistorMode.PullUp, Port.InterruptMode.InterruptEdgeLow);
             button_down = new InterruptPort((Cpu.Pin)FEZ_Pin.Interrupt.An0, true, Port.ResistorMode.PullUp, Port.InterruptMode.InterruptEdgeLow);
@@ -65,26 +61,27 @@ namespace PandaInterrogator
             Cpu.GlitchFilterTime = new TimeSpan(0, 0, 0, 0, 150);
             
             led = new OutputPort((Cpu.Pin)FEZ_Pin.Digital.LED, ledState);
-            //display = new uOLED(new SerialPort("COM1", 9600));
             display = new uOLED(d);
             display.ShutDown(false);
             display.UpdateDeviceInfo(false);
 
+            display.DrawString(0, 0, 2, new byte[] {0,255,0}, "Booting up...");
             Thread.Sleep(500);
             radio = new ZigBit("COM2");
             Random r = new Random();
-            //radio.dataRX += new EventHandler(radio_dataRX);
             display.Cls();
             lastAction = DateTime.Now;
 
-            
             mainMenu = new MainMenu(display, radio, button_up, button_down, button_select, button_back);
             currentMenu = mainMenu;
             mainMenu.active = true;
+            
             while (true)
             {
-                if (DateTime.Now > lastAction.AddMinutes(3)) 
+                if (DateTime.Now > lastAction.AddMinutes(3))
                     screenSaver();
+                else if (DateTime.Now > lastAction.AddSeconds(15))
+                    radio.Scan();
                 Thread.Sleep(200);
             }
         }
@@ -103,35 +100,14 @@ namespace PandaInterrogator
 
         static void screenSaver()
         {
-            /*Random r = new Random();
-            display.Cls();
-            display.DrawString(0, 0, 0, new byte[] { 0xFF, 0xFF }, "Going to sleep");
-            Thread.Sleep(250);
-            for (byte i = 0; i < 4; i++)
-            {
-                display.DrawString((byte)(14 + i), 0, 0, new byte[] { 0xFF, 0xFF }, ".");
-                Thread.Sleep(250);
-            }
-
-            display.Cls();*/
             display.ShutDown(true);
 
             led.Write(ledState = false);
             Thread.Sleep(100);
             Power.Hibernate(Power.WakeUpInterrupt.InterruptInputs);
-            //while(DateTime.Now > lastAction.AddSeconds(1));
             Thread.Sleep(100);
             bool success = display.ShutDown(false);
             Thread.Sleep(500);
-            /*display.DrawString(0, 0, 0, new byte[] { 0xFF, 0xFF }, "Waking up.");
-            for (byte i = 0; i < 4; i++)
-            {
-                display.DrawString((byte)(10 + i), 0, 0, new byte[] { 0xFF, 0xFF }, ".");
-                Thread.Sleep(250);
-            }
-
-            display.Cls();
-            currentMenu.Draw();*/
         }
 
     }
