@@ -70,7 +70,8 @@ namespace EndDevice
             radioConfig.addrExtend = (ulong)ID;
             radioConfig.addrShort = ID;
             radioConfig.baud = 38400;
-            radioConfig.commPort = "COM4";
+            radioConfig.commPort = "COM4"; // fez mini
+            //radioConfig.commPort = "COM1"; // fez panda
             connected = false;
             radioConfig.dataBits = 8;
             radioConfig.echo = false;
@@ -81,7 +82,7 @@ namespace EndDevice
 
             radio = new ZigBit(radioConfig);
             radio.dataRX += new EventHandler(radio_dataRX);
-            
+
             //display.Cls();
             lastAction = DateTime.Now;
 
@@ -142,25 +143,25 @@ namespace EndDevice
                         currentcolor[0] = 255;
                         currentcolor[1] = 0;
                         currentcolor[2] = 0;
-                        radio.Write(0, "RT,COLOR," + color, false);
+                        radio.Write(args.source, "RT,COLOR," + color, false);
                         break;
                     case "BLUE":
                         currentcolor[0] = 0;
                         currentcolor[1] = 255;
                         currentcolor[2] = 0;
-                        radio.Write(0, "RT,COLOR," + color, false);
+                        radio.Write(args.source, "RT,COLOR," + color, false);
                         break;
                     case "GREEN":
                         currentcolor[0] = 0;
                         currentcolor[1] = 0;
                         currentcolor[2] = 255;
-                        radio.Write(0, "RT,COLOR," + color, false);
+                        radio.Write(args.source, "RT,COLOR," + color, false);
                         break;
                     case "OFF":
                         currentcolor[0] = 0;
                         currentcolor[1] = 0;
                         currentcolor[2] = 0;
-                        radio.Write(0, "RT,COLOR," + color, false);
+                        radio.Write(args.source, "RT,COLOR," + color, false);
                         break;
                      
                 }
